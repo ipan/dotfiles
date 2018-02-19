@@ -1,0 +1,13 @@
+https://askubuntu.com/a/690203
+
+Pip currently ignores uninstall commands that try to uninstall something owned by the OS. 
+It doesn't error out, like it does with a missing package. So, now you can uninstall with the following process:
+
+    pip freeze > dump.txt
+
+Edit the dumped file to remove any -e "editable install" lines, everything after the == sign
+(%s;==.*;;g in vim), swap the new lines for spaces (%s;\n; ;g in vim) or pipe with `tr`
+
+    cat dump.txt  | tr '\n' ' ' | xargs sudo pip uninstall -y
+
+I had to do this procedure twice, because a few packages were installed in ~/.local/lib too.

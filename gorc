@@ -1,0 +1,11 @@
+# set golang workspace
+export GOPATH=$HOME/go
+
+# for mac, installed by homebrew
+export GOROOT=/usr/local/opt/go/libexec
+
+# for linux
+export GOROOT=/usr/local/go/
+
+export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:$GOROOT/bin

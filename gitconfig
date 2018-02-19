@@ -1,0 +1,30 @@
+[user]
+    name = Ivan Pan
+    email = me@ivanpan.com
+
+[core]
+    editor = vim
+    quotepath = false
+
+[log]
+    date = local
+
+[color]
+    branch = auto
+    diff = auto
+    interactive = auto
+    status = auto
+    ui = true
+
+[alias]
+    st = status
+    co = checkout
+    up = pull --rebase
+    mlog = log --no-merges
+    ls = log --name-only -- .
+    sh = show --name-only
+    cp = cherry-pick
+
+[push]
+    default = simple
+

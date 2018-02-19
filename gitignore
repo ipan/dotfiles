@@ -1,0 +1,13 @@
+# temp files
+*.swp
+.DS_Store
+
+# IDE
+.project
+.pydevproject
+.idea/
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
