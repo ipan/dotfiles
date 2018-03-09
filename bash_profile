@@ -10,6 +10,10 @@ if [ -n $XDG_DATA_HOME ]; then
 fi
 
 # path
+if [ -d $HOME/go/bin ]; then
+    export PATH="$HOME/go/bin:$PATH"
+fi
+
 if [ -d $HOME/bin ]; then
     export PATH="$HOME/bin:$PATH"
 fi
