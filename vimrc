@@ -31,6 +31,12 @@ au VimLeave * :!clear
 " python: remove trailing spaces
 autocmd BufWritePre *.py :%s/\s\+$//e
 
+"split navigations
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+
 " == vim plugins ==
 
 " install vim-plug if not found
@@ -39,6 +45,16 @@ if empty(glob('~/.vim/autoload/plug.vim'))
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
+
+function! BuildYCM(info)
+  " info is a dictionary with 3 fields
+  " - name:   name of the plugin
+  " - status: 'installed', 'updated', or 'unchanged'
+  " - force:  set on PlugInstall! or PlugUpdate!
+  if a:info.status == 'installed' || a:info.force
+    !./install.py
+  endif
+endfunction
 
 " vim plugins, use single quote
 call plug#begin('~/.vim/plugged')
@@ -58,10 +74,11 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-sensible'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
 call plug#end()
 
 " vim-colorschemes
-silent! colorscheme 256-grayvim
+silent! colorscheme zenburn
 
 " airline-themes
 let g:airline_therme='onedark'

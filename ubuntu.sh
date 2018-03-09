@@ -12,6 +12,7 @@ pkg=(
 bash-completion
 byobu
 ctags
+cmake
 git
 htop
 silversearcher-ag
