@@ -12,6 +12,7 @@ bash-completion
 bash-git-prompt
 byobu
 ctags
+cmake
 git
 htop
 python3
