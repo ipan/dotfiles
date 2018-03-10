@@ -20,7 +20,8 @@ if [ -n $(which vim) ]; then
 fi
 
 brewdir=''
-if [ -n $(which brew) ]; then
+which brew > /dev/null 2>&1
+if [ $? == 0 ]; then
 	brewdir=$(brew --prefix)
 fi
 
@@ -41,9 +42,9 @@ if [ -f "${brewdir}/opt/bash-git-prompt/share/gitprompt.sh" ]; then
 fi
 
 # linux / git clone
-if [ -f "${XDG_DATA_HOME}/bash-git-promot/gitprompt.sh" ]; then
+if [ -f "${XDG_DATA_HOME}/bash-git-prompt/gitprompt.sh" ]; then
   GIT_PROMPT_ONLY_IN_REPO=1
-  source "${XDG_DATA_HOME}/bash-git-promot/gitprompt.sh"
+  source "${XDG_DATA_HOME}/bash-git-prompt/gitprompt.sh"
   export GIT_PROMPT_THEME=Solarized
 fi
 
