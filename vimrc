@@ -51,13 +51,14 @@ vnoremap <leader>P "+P
 
 " == vim plugins ==
 
-" install vim-plug if not found
+" Plug: install vim-plug if not found
 if empty(glob('~/.vim/autoload/plug.vim'))
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+" YouCompleteMe:
 function! BuildYCM(info)
   " info is a dictionary with 3 fields
   " - name:   name of the plugin
@@ -68,7 +69,7 @@ function! BuildYCM(info)
   endif
 endfunction
 
-" vim plugins, use single quote
+" Plug: vim plugins, use single quote
 call plug#begin('~/.vim/plugged')
 Plug 'airblade/vim-gitgutter'
 Plug 'ctrlpvim/ctrlp.vim'
@@ -90,42 +91,43 @@ Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
 call plug#end()
 
 " vim-colorschemes
-silent! colorscheme zenburn
+set t_Co=256
+silent! colorscheme xoria256
 
 " airline-themes
 let g:airline_therme='onedark'
 
-" CtrlP
+" CtrlP:
 let g:ctrlp_working_path_mode = 'ra'
 nmap <Leader>r :CtrlPBufTag<CR>
 
-" TagBar
+" TagBar:
 nmap <Leader>rt :TagbarToggle<CR>
 
-" NERDTree
+" NERDTree:
 map <C-n> :NERDTreeToggle<CR>
 
-" syntastic
+" Syntastic: syntax highlight
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_python_checkers = ['flake8']
 
-" EasyMotion
+" EasyMotion:
 let g:EasyMotion_do_mapping = 0 " Disable default mappings
 
-" <Leader>f{char} to move to {char}
+" EasyMotion: <Leader>f{char} to move to {char}
 map  <Leader>f <Plug>(easymotion-bd-f)
 nmap <Leader>f <Plug>(easymotion-overwin-f)
 
-" s{char}{char} to move to {char}{char}
+" EasyMotion: s{char}{char} to move to {char}{char}
 nmap s <Plug>(easymotion-overwin-f2)
 
-" Move to line
+" EasyMotion: Move to line
 map <Leader>L <Plug>(easymotion-bd-jk)
 nmap <Leader>L <Plug>(easymotion-overwin-line)
 
-" Move to word
+" EasyMotion: Move to word
 map  <Leader>w <Plug>(easymotion-bd-w)
 nmap <Leader>w <Plug>(easymotion-overwin-w)
 
