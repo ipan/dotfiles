@@ -1,5 +1,8 @@
 # .bash_profile
 
+export LC_ALL=en_US.UTF-8  
+export LANG=en_US.UTF-8
+
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 if [ -n $XDG_CONFIG_HOME ]; then
 	export XDG_CONFIG_HOME="$HOME/.config"
