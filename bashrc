@@ -61,3 +61,5 @@ case "$TERM" in
 esac
 
 [ -r "${HOME}/.byobu/prompt" ] && . "${HOME}/.byobu/prompt"   #byobu-prompt#
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
