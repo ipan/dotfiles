@@ -7,7 +7,7 @@ fi
 
 source bash_profile
 
-# must-have toolsV
+# must-have tools
 pkg=(
 bash-completion
 byobu
