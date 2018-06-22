@@ -44,32 +44,43 @@ function linkme {
     eval $cmd
 }
 
-echo $XDG_CONFIG_HOME
-echo $XDG_DATA_HOME
+echo "XDG_CONFIG_HOME: $XDG_CONFIG_HOME" 
+echo "XDG_DATA_HOME: $XDG_DATA_HOME"
 
-# bash
-linkme bash_profile
-linkme bashrc
-linkme bash_aliases bash aliases
-
-# git
-linkme gitconfig git config
-linkme gitignore git ignore
-
-# vim
-linkme vimrc
-linkme init.vim nvim
-
-# flake8
-linkme flake8 $NODIR
-
-# pep8
-linkme pep8 $NODIR
-
-# pip
-mac_config="$HOME/Library/Application Support"
-if [ -d "$mac_config" ]; then
-    XDG_CONFIG_HOME="$mac_config"
-fi
-linkme pip.conf pip
-
+case $1 in 
+    'bash' )
+        # bash
+        linkme bash_profile
+        linkme bashrc
+        linkme bash_aliases bash aliases
+        ;;
+    'git' )
+        # git
+        linkme gitconfig git config
+        linkme gitignore git ignore
+        ;;
+    'vim' )
+        # vim
+        linkme vimrc
+        linkme init.vim nvim
+        ;;
+    'python' )
+        # flake8
+        linkme flake8 $NODIR
+        
+        # pep8
+        linkme pep8 $NODIR
+        
+        # pip
+        mac_config="$HOME/Library/Application Support"
+        if [ -d "$mac_config" ]; then
+            XDG_CONFIG_HOME="$mac_config"
+        fi
+        linkme pip.conf pip
+        ;;
+    * )
+        echo "$1 is not valid command"
+        echo "usage:"
+        echo "    $0 [bash|git|vim|python]"
+        ;;
+esac
