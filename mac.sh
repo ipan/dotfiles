@@ -13,11 +13,14 @@ bash-git-prompt
 byobu
 ctags
 cmake
+gnu-sed
 git
+jq
 htop
 python3
 vim
-nvim
+neovim
+tree
 wget
 )
 
@@ -25,7 +28,11 @@ cmd="brew update"
 echo $cmd
 eval $cmd
 
-cmd="brew install ${pkg[@]}"
+cmd="brew upgrade"
+echo $cmd
+eval $cmd
+
+cmd="brew install --with-default-names ${pkg[@]}"
 echo $cmd
 eval $cmd
 
