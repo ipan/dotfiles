@@ -15,13 +15,21 @@ set expandtab
 set tabstop=4
 set shiftwidth=4
 
-" map <Esc> to exit terminal-mode
+" Term: map <Esc> to exit terminal-mode
 tnoremap <Esc> <C-\><C-n>
 
-" python: remove trailing spaces
-autocmd BufWritePre *.py :%s/\s\+$//e
+" Split: behavior and shortcut
+" reszie +5 / vertical resize -
+" ctrl-w = (vertical)
+" ctrl-w | (max width)
+" ctrl-w _ (max height)
+" ctrl-w R (swap)
+" ctrl-w T (move to tab)
+" ctrl-w o (close all window but current)
+set splitbelow
+set splitright
 
-"split navigations, down (j), up (k), right (l), left(h)
+" navigations, down (j), up (k), right (l), left(h)
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>

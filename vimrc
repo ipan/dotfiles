@@ -1,4 +1,12 @@
-" vimrc
+" vim settings
+"
+" <leader> -> \
+" <C> -> Control
+" j: down
+" k: up
+" h: left
+" l: right
+
 set nocompatible
 set mouse=a
 
@@ -17,21 +25,23 @@ set encoding=utf-8
 set wildmode=list:longest,list:full
 set wildignore+=*.o,*.obj,.git,*.pyc,*.rbc,*.class,.svn,vendor/gems/*,*/tmp/*,*.so,*.swp,*.zip
 
-" 'set paste' interfere with autoindent
-set pastetoggle=<F2>
-
 " Prevent Vim from clobbering the scrollback buffer. See
 " http://www.shallowsky.com/linux/noaltscreen.html
 set t_ti= t_te=
 au VimLeave * :!clear
 
-" yaml for ansible
-" autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+" Split: behavior and shortcut
+" reszie +5 / vertical resize -
+" ctrl-w = (vertical)
+" ctrl-w | (max width)
+" ctrl-w _ (max height)
+" ctrl-w R (swap)
+" ctrl-w T (move to tab)
+" ctrl-w o (close all window but current)
+set splitbelow
+set splitright
 
-" python: remove trailing spaces
-autocmd BufWritePre *.py :%s/\s\+$//e
-
-"split navigations
+" navigations, down (j), up (k), right (l), left (h)
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
