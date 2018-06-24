@@ -79,7 +79,7 @@ Plug 'flazz/vim-colorschemes'
 Plug 'haya14busa/incsearch.vim'
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'junegunn/fzf.vim'
-Plug 'junegunn/fzf', { 'dir': '~/.loca/share/fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
 Plug 'majutsushi/tagbar'
 Plug 'myusuf3/numbers.vim'
 Plug 'pearofducks/ansible-vim'
