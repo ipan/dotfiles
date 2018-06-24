@@ -13,6 +13,7 @@ bash-git-prompt
 byobu
 cmake
 ctags
+fzf
 git
 gnu-sed
 htop
