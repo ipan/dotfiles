@@ -53,6 +53,7 @@ case $1 in
         linkme bash_profile
         linkme bashrc
         linkme bash_aliases bash aliases
+        source "$HOME/.bash_profile"
         ;;
     'git' )
         # git

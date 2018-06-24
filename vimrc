@@ -71,12 +71,15 @@ endif
 " Plug: vim plugins, use single quote
 call plug#begin('~/.vim/plugged')
 Plug 'airblade/vim-gitgutter'
+Plug 'ambv/black'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'fatih/vim-go'
 Plug 'flazz/vim-colorschemes'
 Plug 'haya14busa/incsearch.vim'
 Plug 'jeetsukumaran/vim-buffergator'
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/fzf', { 'dir': '~/.loca/share/fzf', 'do': './install --all' }
 Plug 'majutsushi/tagbar'
 Plug 'myusuf3/numbers.vim'
 Plug 'pearofducks/ansible-vim'
@@ -84,12 +87,9 @@ Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/syntastic'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-sensible'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'ambv/black'
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-airline/vim-airline'
 call plug#end()
 
 " vim-colorschemes

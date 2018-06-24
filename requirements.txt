@@ -1,4 +1,6 @@
-flake8
 black
+flake8
+ipython
+mypy
 neovim
 pipenv
