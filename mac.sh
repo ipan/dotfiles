@@ -11,16 +11,16 @@ ag
 bash-completion
 bash-git-prompt
 byobu
-ctags
 cmake
-gnu-sed
+ctags
 git
-jq
+gnu-sed
 htop
-python3
-vim
+jq
 neovim
+python3
 tree
+vim
 wget
 )
 
@@ -33,6 +33,14 @@ echo $cmd
 eval $cmd
 
 cmd="brew install --with-default-names ${pkg[@]}"
+echo $cmd
+eval $cmd
+
+cmd="brew cleanup"
+echo $cmd
+eval $cmd
+
+cmd="brew doctor"
 echo $cmd
 eval $cmd
 

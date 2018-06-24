@@ -11,8 +11,8 @@ source bash_profile
 pkg=(
 bash-completion
 byobu
-ctags
 cmake
+ctags
 git
 htop
 silversearcher-ag
