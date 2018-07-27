@@ -10,13 +10,16 @@
 " for buggy terminal
 set guicursor=
 
+" Stop certain movements from always going to the first character of a line.
+set nostartofline
+
+" Set encoding
+set encoding=utf-8
+
 " whitespaces
 set expandtab
 set tabstop=4
 set shiftwidth=4
-
-" Term: map <Esc> to exit terminal-mode
-tnoremap <Esc> <C-\><C-n>
 
 " Split: behavior and shortcut
 " reszie +5 / vertical resize -
@@ -47,6 +50,11 @@ nnoremap <leader>P "+P
 vnoremap <leader>p "+p
 vnoremap <leader>P "+P
 
+" == neovim only ==
+" NeoVim Term: map <Esc> to exit terminal-mode
+tnoremap <Esc> <C-\><C-n>
+
+" == vim plugins ==
 " install vim-plug if not found
 if empty(glob('~/.config/nvim/autoload/plug.vim'))
   silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
@@ -56,28 +64,32 @@ endif
 
 " Plug: vim plugins, use single quote
 call plug#begin('~/.local/share/nvim/plugged')
-Plug 'airblade/vim-gitgutter'
-Plug 'ambv/black'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'easymotion/vim-easymotion'
-Plug 'fatih/vim-go'
+" general settings
+Plug 'tpope/vim-sensible'
+" colorscheme
 Plug 'flazz/vim-colorschemes'
+" status
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+" git
+Plug 'tpope/vim-fugitive'
+" gutter
+Plug 'airblade/vim-gitgutter'
+Plug 'myusuf3/numbers.vim'
+" syntax hightlight and error check
+Plug 'scrooloose/syntastic'
+" code search and navigation
 Plug 'haya14busa/incsearch.vim'
 Plug 'jeetsukumaran/vim-buffergator'
-Plug 'jodosha/vim-godebug'
+Plug 'majutsushi/tagbar'
+" file search and navgigation
+Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
-Plug 'majutsushi/tagbar'
-Plug 'myusuf3/numbers.vim'
-Plug 'pearofducks/ansible-vim'
-Plug 'scrooloose/nerdtree'
-Plug 'scrooloose/syntastic'
+" python (py3.6 above)
+Plug 'ambv/black'
+" autocomplate (neovim/vim8)
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-sensible'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'vim-airline/vim-airline'
-Plug 'zchee/deoplete-go', { 'do': 'make'}
 Plug 'zchee/deoplete-jedi'
 call plug#end()
 
@@ -85,11 +97,7 @@ call plug#end()
 silent! colorscheme 256-grayvim
 
 " airline-themes:
-let g:airline_therme='onedark'
-
-" CtrlP:
-let g:ctrlp_working_path_mode = 'ra'
-nmap <Leader>r :CtrlPBufTag<CR>
+let g:airline_theme='minimalist'
 
 " TagBar:
 nmap <Leader>rt :TagbarToggle<CR>
@@ -102,24 +110,6 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_python_checkers = ['flake8']
-
-" EasyMotion:
-let g:EasyMotion_do_mapping = 0 " Disable default mappings
-
-" EasyMotion: <Leader>f{char} to move to {char}
-map  <Leader>f <Plug>(easymotion-bd-f)
-nmap <Leader>f <Plug>(easymotion-overwin-f)
-
-" EasyMotion: {char}{char} to move to {char}{char}
-nmap s <Plug>(easymotion-overwin-f2)
-
-" EasyMotion: Move to line
-map <Leader>L <Plug>(easymotion-bd-jk)
-nmap <Leader>L <Plug>(easymotion-overwin-line)
-
-" EasyMotion Move to word
-map  <Leader>w <Plug>(easymotion-bd-w)
-nmap <Leader>w <Plug>(easymotion-overwin-w)
 
 " deoplete: (nvim/vim8)
 let g:deoplete#enable_at_startup = 1
