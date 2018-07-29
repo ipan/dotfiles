@@ -113,3 +113,4 @@ let g:syntastic_python_checkers = ['flake8']
 
 " deoplete: (nvim/vim8)
 let g:deoplete#enable_at_startup = 1
+autocmd FileType python setlocal completeopt-=preview
