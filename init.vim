@@ -86,15 +86,14 @@ Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
-" python (py3.6 above)
-Plug 'ambv/black'
-" autocomplate (neovim/vim8)
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'zchee/deoplete-jedi'
+" code format and autocomplate
+Plug 'ambv/black' " py3.6 required
+Plug 'ervandew/supertab'
+Plug 'davidhalter/jedi-vim'
 call plug#end()
 
 " vim-colorschemes:
-silent! colorscheme 256-grayvim
+silent! colorscheme molokai_dark
 
 " airline-themes:
 let g:airline_theme='minimalist'
@@ -111,6 +110,3 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_python_checkers = ['flake8']
 
-" deoplete: (nvim/vim8)
-let g:deoplete#enable_at_startup = 1
-autocmd FileType python setlocal completeopt-=preview
