@@ -90,8 +90,9 @@ Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
-" python (py3.6 above)
-Plug 'ambv/black'
+" code formatting and completion
+Plug 'ambv/black' " py3.6
+Plug 'ervandew/supertab'
 Plug 'davidhalter/jedi-vim'
 call plug#end()
 
