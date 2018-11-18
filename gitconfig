@@ -23,7 +23,8 @@
     mlog = log --no-merges
     ls = log --name-only -- .
     sh = show --name-only
-    cp = cherry-pick
+    cp = cherry-pick -x
+    cpx = cherry-pick -x -X theirs
 
 [push]
     default = simple
