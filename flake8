@@ -2,4 +2,4 @@
 max-line-length = 120
 exclude = tests/*
 max-complexity = 10
-ignore=W391,E128
+ignore=W391,E128,C901,W503,E1,E402
