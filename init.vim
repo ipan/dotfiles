@@ -76,8 +76,6 @@ Plug 'tpope/vim-fugitive'
 " gutter
 Plug 'airblade/vim-gitgutter'
 Plug 'myusuf3/numbers.vim'
-" syntax hightlight and error check
-Plug 'scrooloose/syntastic'
 " code search and navigation
 Plug 'haya14busa/incsearch.vim'
 Plug 'jeetsukumaran/vim-buffergator'
@@ -88,8 +86,6 @@ Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
 " code format and autocomplate
 Plug 'ambv/black' " py3.6 required
-Plug 'ervandew/supertab'
-Plug 'davidhalter/jedi-vim'
 call plug#end()
 
 " vim-colorschemes:
@@ -103,10 +99,4 @@ nmap <Leader>rt :TagbarToggle<CR>
 
 " NERDTree:
 map <C-n> :NERDTreeToggle<CR>
-
-" syntastic: syntax hightlight
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_python_checkers = ['flake8']
 

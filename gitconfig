@@ -25,6 +25,7 @@
     sh = show --name-only
     cp = cherry-pick -x
     cpx = cherry-pick -x -X theirs
+    cpm = cherry-pick -x -m 1
 
 [push]
     default = simple
