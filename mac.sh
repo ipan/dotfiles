@@ -28,11 +28,11 @@ cmd="brew update"
 echo $cmd
 eval $cmd
 
-cmd="brew upgrade"
-echo $cmd
-eval $cmd
+# cmd="brew upgrade"
+# echo $cmd
+# eval $cmd
 
-cmd="brew install --with-default-names ${pkg[@]}"
+cmd="brew install ${pkg[@]}"
 echo $cmd
 eval $cmd
 
