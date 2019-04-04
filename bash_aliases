@@ -16,6 +16,7 @@ fi
 
 if [ "$(uname)" == "Darwin" ]; then
   alias flushdns='dscacheutil -flushcache;sudo killall -HUP mDNSResponder && echo DNS flushed'
+  alias byobu='BYOBU_PYTHON=`which python3` byobu'
 fi
 
 # docker related
