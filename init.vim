@@ -21,6 +21,12 @@ set expandtab
 set tabstop=4
 set shiftwidth=4
 
+" set title of terminal
+set title
+
+" make sure number in gutter is not copied
+set mouse=a
+
 " Split: behavior and shortcut
 " reszie +5 / vertical resize -
 " ctrl-w = (vertical)
@@ -53,6 +59,12 @@ vnoremap <leader>P "+P
 " == neovim only ==
 " NeoVim Term: map <Esc> to exit terminal-mode
 tnoremap <Esc> <C-\><C-n>
+
+
+" live substitute
+if exists('&inccommand')
+  set inccommand=split
+endif
 
 " == vim plugins ==
 " install vim-plug if not found
