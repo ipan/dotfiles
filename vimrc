@@ -21,6 +21,12 @@ set expandtab
 set tabstop=4
 set shiftwidth=4
 
+" set title of terminal
+set title
+
+" make sure number in gutter is not copied
+set mouse=a
+
 " Split: behavior and shortcut
 " reszie +5 / vertical resize -
 " ctrl-w = (vertical)
@@ -105,3 +111,5 @@ nmap <Leader>rt :TagbarToggle<CR>
 " NERDTree:
 map <C-n> :NERDTreeToggle<CR>
 
+" Black
+let g:black_virtualenv = '/usr/local/bin/'
