@@ -78,8 +78,9 @@ endif
 call plug#begin('~/.local/share/nvim/plugged')
 " general settings
 Plug 'tpope/vim-sensible'
-" colorscheme
+" colorscheme and syntax
 Plug 'flazz/vim-colorschemes'
+Plug 'sheerun/vim-polyglot'
 " status
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
