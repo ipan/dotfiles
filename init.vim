@@ -113,3 +113,5 @@ nmap <Leader>rt :TagbarToggle<CR>
 " NERDTree:
 map <C-n> :NERDTreeToggle<CR>
 
+" Black:
+let g:black_virtualenv = '/usr/local/bin/'
