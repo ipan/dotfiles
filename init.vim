@@ -98,7 +98,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
 " code format and autocomplate
-Plug 'ambv/black' " py3.6 required
+Plug 'psf/black' " py3.6 required
 call plug#end()
 
 " vim-colorschemes:

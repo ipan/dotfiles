@@ -40,3 +40,6 @@ if [ -n $(which docker) ]; then
   fi
 fi
 
+
+# git relate
+alias gitwork='git config user.email ivan.pan@thermofisher.com'
