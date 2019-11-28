@@ -3,6 +3,10 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+if [ -f /etc/bashrc ]; then
+  source /etc/bashrc
+fi
+
 # shell options
 shopt -s histappend
 shopt -s checkwinsize
@@ -15,8 +19,12 @@ HISTSIZE=50000
 HISTFILESIZE=50000
 
 # editor
-if [ -n $(which vim) ]; then
+if [ -n $(which nvim) ]; then
+  export EDITOR=nvim
+elif [ -n $(which vim) ]; then
   export EDITOR=vim
+else
+  export EDITOR=vi
 fi
 
 brewdir=''
