@@ -80,6 +80,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 Plug 'tpope/vim-sensible'
 " colorscheme and syntax
 Plug 'flazz/vim-colorschemes'
+Plug 'robertmeta/nofrils'
 Plug 'sheerun/vim-polyglot'
 " status
 Plug 'vim-airline/vim-airline'
@@ -97,12 +98,11 @@ Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
-" code format and autocomplate
-Plug 'psf/black' " py3.6 required
 call plug#end()
 
 " vim-colorschemes:
-silent! colorscheme molokai_dark
+" silent! colorscheme molokai_dark
+silent! colorscheme nofrils-dark
 
 " airline-themes:
 let g:airline_theme='minimalist'
@@ -114,4 +114,7 @@ nmap <Leader>rt :TagbarToggle<CR>
 map <C-n> :NERDTreeToggle<CR>
 
 " Black:
-let g:black_virtualenv = '/usr/local/bin/'
+if executable("black")
+    Plug 'psf/black'
+    let g:black_virtualenv = '/usr/local/bin/'
+endif
