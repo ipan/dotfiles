@@ -96,6 +96,9 @@ Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
+if executable("black")
+    Plug 'psf/black'
+endif
 call plug#end()
 
 " vim-colorschemes
@@ -114,7 +117,6 @@ map <C-n> :NERDTreeToggle<CR>
 
 " Black
 if executable("black")
-    Plug 'psf/black'
     let g:black_virtualenv = '/usr/local/bin/'
 endif
 
