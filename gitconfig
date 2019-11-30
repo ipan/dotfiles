@@ -3,7 +3,7 @@
     email = [redacted-email]
 
 [core]
-    editor = vim
+    editor = $EDITOR
     quotepath = false
 
 [log]
