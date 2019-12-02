@@ -13,11 +13,10 @@ bash-completion
 byobu
 cmake
 ctags
-git
 htop
 silversearcher-ag
-vim
 wget
+curl
 )
 
 cmd="apt-get update"
@@ -27,6 +26,11 @@ eval $cmd
 cmd="apt-get install -y -q ${pkg[@]}"
 echo $cmd
 eval $cmd
+
+# neovim
+mkdir -p ~/bin
+wget -O ~/bin/nvim https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
+chmod +x ~/bin/nvim
 
 # bash git promot
 git_prompt_dir="$XDG_DATA_HOME/bash-git-prompt"
