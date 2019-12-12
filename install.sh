@@ -159,7 +159,7 @@ setup_nvim() {
     esac
         
     # ~/.config/nvim/init.vim
-    linkme init.vim nvim
+    linkme vimrc nvim init.vim
 }
 
 

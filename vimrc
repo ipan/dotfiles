@@ -56,12 +56,26 @@ nnoremap <leader>P "+P
 vnoremap <leader>p "+p
 vnoremap <leader>P "+P
 
-" == vim only ==
+if has("nvim")
+    " == neovim only ==
+    " NeoVim Term: map <Esc> to exit terminal-mode
+    tnoremap <Esc> <C-\><C-n>
+else
+    " == vim only ==
+    " Prevent Vim from clobbering the scrollback buffer. See
+    " http://www.shallowsky.com/linux/noaltscreen.html
+    set t_ti= t_te=
+    au VimLeave * :!clear
+endif
 
-" Prevent Vim from clobbering the scrollback buffer. See
-" http://www.shallowsky.com/linux/noaltscreen.html
-set t_ti= t_te=
-au VimLeave * :!clear
+" live substitute: neovim only
+if exists('&inccommand')
+  set inccommand=split
+endif
+
+" Python
+let g:python_host_prog  = '/usr/bin/python2'
+let g:python3_host_prog = '/usr/local/bin/python3'
 
 " == vim plugins ==
 
@@ -72,8 +86,14 @@ if empty(glob('~/.vim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+if has('nvim')
+    let g:vim_plug_dir = '~/.local/share/nvim/plugged'
+else
+    let g:vim_plug_dir = '~/.vim/plugged'
+endif
+
 " Plug: vim plugins, use single quote
-call plug#begin('~/.vim/plugged')
+call plug#begin(vim_plug_dir)
 " general settings
 Plug 'tpope/vim-sensible'
 " colorscheme
@@ -105,10 +125,12 @@ if executable("black") && has("python3")
 endif
 if has("python3")
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-  " below needed for vim
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
 
+  if !has("nvim")
+    " below needed for vim
+    Plug 'roxma/nvim-yarp'
+    Plug 'roxma/vim-hug-neovim-rpc'
+  endif
 
   Plug 'deoplete-plugins/deoplete-jedi'
   Plug 'deoplete-plugins/deoplete-zsh'
@@ -133,9 +155,6 @@ map <C-n> :NERDTreeToggle<CR>
 if executable("black") && has("python3")
     let g:black_virtualenv = '/usr/local/bin/'
 endif
-
-" Python
-let g:python3_host_prog = '/usr/local/bin/python3'
 
 " Deoplete
 " Enable deoplete when InsertEnter.
