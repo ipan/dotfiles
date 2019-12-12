@@ -171,6 +171,12 @@ setup_nvim() {
             install_mac neovim
             install_python pynvim
             ;;
+        'ubuntu' )
+            nvim_stable='https://github.com/neovim/neovim/releases/download/stable/nvim.appimage'
+            mkdir -p ~/bin
+            wget -O ~/bin/nvim $nvim_stable
+            chmod +x ~/bin/nvim
+            ;;
     esac
         
     # ~/.config/nvim/init.vim
