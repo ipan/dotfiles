@@ -77,9 +77,11 @@ call plug#begin('~/.vim/plugged')
 " general settings
 Plug 'tpope/vim-sensible'
 " colorscheme
-Plug 'robertmeta/nofrils'
-Plug 'flazz/vim-colorschemes'
 Plug 'sheerun/vim-polyglot'
+Plug 'robertmeta/nofrils'
+Plug 'arzg/vim-corvine'
+Plug 'dracula/vim'
+Plug 'jdsimcoe/panic.vim'
 " status
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -96,14 +98,26 @@ Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
-if executable("black")
+" python
+Plug 'tweekmonster/impsort.vim'
+if executable("black") && has("python3")
     Plug 'psf/black'
+endif
+if has("python3")
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+  " below needed for vim
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+
+
+  Plug 'deoplete-plugins/deoplete-jedi'
+  Plug 'deoplete-plugins/deoplete-zsh'
+
+  Plug 'wellle/tmux-complete.vim'
 endif
 call plug#end()
 
-" vim-colorschemes
-set t_Co=256
-" silent! colorscheme 256-grayvim
+" colorschemes
 silent! colorscheme nofrils-dark
 
 " airline-themes
@@ -116,7 +130,16 @@ nmap <Leader>rt :TagbarToggle<CR>
 map <C-n> :NERDTreeToggle<CR>
 
 " Black
-if executable("black")
+if executable("black") && has("python3")
     let g:black_virtualenv = '/usr/local/bin/'
 endif
 
+" Python
+let g:python3_host_prog = '/usr/local/bin/python3'
+
+" Deoplete
+" Enable deoplete when InsertEnter.
+if has("python3")
+  let g:deoplete#enable_at_startup = 0
+  autocmd InsertEnter * call deoplete#enable()
+endif
