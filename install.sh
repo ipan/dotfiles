@@ -1,10 +1,20 @@
-#!/bin/bash
+#!/bin/sh
+
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+if [ -n $XDG_CONFIG_HOME ]; then
+    export XDG_CONFIG_HOME="$HOME/.config"
+fi
+
+if [ -n $XDG_DATA_HOME ]; then
+    export XDG_DATA_HOME="$HOME/.local/share"
+fi
+
+echo "XDG_CONFIG_HOME: $XDG_CONFIG_HOME" 
+echo "XDG_DATA_HOME: $XDG_DATA_HOME"
 
 NODIR='__NODIR__'
 
-source bash_profile
-
-function linkme {
+linkme() {
     rc=$1
     folder=$2
     filename=$3
@@ -39,49 +49,228 @@ function linkme {
         mv -v "${dst}" $rc.old
     fi
 
-    cmd="ln -svf '$(pwd)/$rc' '${dst}'"
-    echo $cmd
-    eval $cmd
+    ln -svf $(pwd)/$rc ${dst}
 }
 
-echo "XDG_CONFIG_HOME: $XDG_CONFIG_HOME" 
-echo "XDG_DATA_HOME: $XDG_DATA_HOME"
+detect_os() {
+    if [ "$(uname)" = "Darwin" ]; then
+        printf "macos"
+        return
+    fi
 
-case $1 in 
+    os_name=$(awk -F= '/^NAME/{print $2}' /etc/os-release)
+    case $os_name in
+        "Ubuntu" )
+            printf "ubuntu"
+            ;;
+        "CentOS Linux" )
+            printf "centos"
+            ;;
+        "*" )
+            printf "unknown"
+            ;;
+    esac
+}
+
+install_mac() {
+    if [ ! $(which brew) ]; then
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    fi
+
+    brew install $@
+}
+
+install_ubuntu() {
+    apt-get install --no-upgrade --assume-yes $@
+}
+
+install_python() {
+    python3 -m pip install --user $@
+}
+
+setup_zsh() {
+    # TODO: install oh-my-zsh
+
+    # ~/.zshrc
+    # ~/.aliases
+    linkme zshrc
+    linkme aliases
+
+    # activate new settings
+    source $HOME/.zshrc
+}
+
+setup_bash() {
+    case $(detect_os) in
+        'macos' )
+            install_mac bash-completion bash-git-prompt
+            ;;
+        'ubuntu' )
+            install_ubuntu bash-completion git
+            git clone https://github.com/magicmonty/bash-git-prompt.git $XDG_CONFIG_HOME/bash-git-prompt --depth 1
+            ;;
+    esac
+
+    # ~/.bashrc
+    # ~/.aliases
+    linkme bashrc
+    linkme aliases
+    # remove old aliaes if found
+    rm -rf "$XDG_CONFIG_HOME/.bash_profile"
+    rm -rf "$XDG_CONFIG_HOME/bash/aliases"
+    
+    source $HOME/.bashrc
+}
+
+setup_git() {
+    case $(detect_os) in
+        'macos' )
+            install_mac git
+            ;;
+        'ubuntu' )
+            install_ubuntu git
+            ;;
+    esac
+    # ~/.config/git/{config,ignore}
+    linkme gitconfig git config
+    linkme gitignore git ignore
+}
+
+setup_vim() {
+    case $(detect_os) in
+        'macos' )
+            install_mac vim
+            ;;
+        'ubuntu' )
+            install_ubuntu vim
+            ;;
+    esac
+    # ~/.vimrc
+    linkme vimrc
+}
+
+setup_nvim() {
+    # https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
+    case $(detect_os) in
+        'macos' )
+            install_mac neovim
+            install_python pynvim
+            ;;
+    esac
+        
+    # ~/.config/nvim/init.vim
+    linkme init.vim nvim
+}
+
+
+setup_macos() {
+    pkg=(
+    ag
+    byobu
+    cmake
+    ctags
+    curl
+    gnu-sed
+    htop
+    jq
+    tree
+    wget
+    )
+
+    install_mac ${pkg[@]}
+}
+
+setup_ubuntu() {
+    pkg=(
+    byobu
+    cmake
+    ctags
+    curl
+    git
+    htop
+    jq
+    silversearcher-ag
+    wget
+    )
+
+    install_ubuntu ${pkg[@]}
+}
+    
+
+setup_os() {
+    case $(detect_os) in
+        'macos' )
+            setup_macos
+            ;;
+        'ubuntu' )
+            setup_ubuntu
+            ;;
+    esac
+}
+
+setup_python() {
+    case $(detect_os) in
+        'macos' )
+            install_mac python3
+            ;;
+        'ubuntu' )
+            install_ubuntu python3 python3-pip 
+            ;;
+    esac
+
+    # install basic python packages
+    install_python black flake8 pipenv
+    
+    # flake8
+    linkme flake8 $NODIR
+    
+    # pep8
+    linkme pep8 $NODIR
+    
+    # pip
+    mac_config="$HOME/Library/Application Support"
+    if [ -d "$mac_config" ]; then
+        XDG_CONFIG_HOME="$mac_config"
+    fi
+    linkme pip.conf pip
+}
+
+
+case $1 in
+    'zsh' )
+        setup_zsh
+        ;;
     'bash' )
-        # bash
-        linkme bash_profile
-        linkme bashrc
-        linkme bash_aliases bash aliases
-        source "$HOME/.bash_profile"
+        setup_bash
         ;;
     'git' )
-        # git
-        linkme gitconfig git config
-        linkme gitignore git ignore
+        setup_git
         ;;
     'vim' )
-        # vim
-        linkme vimrc
-        linkme init.vim nvim
+        setup_vim
+        ;;
+    'nvim' )
+        setup_nvim
+        ;;
+    'os' )
+        setup_os
+        ;;
+    'mac' )
+        setup_macos
+        ;;
+    'ubuntu' )
+        setup_ubuntu
         ;;
     'python' )
-        # flake8
-        linkme flake8 $NODIR
-        
-        # pep8
-        linkme pep8 $NODIR
-        
-        # pip
-        mac_config="$HOME/Library/Application Support"
-        if [ -d "$mac_config" ]; then
-            XDG_CONFIG_HOME="$mac_config"
-        fi
-        linkme pip.conf pip
+        setup_python
+        ;;
+    'go' )
+        # TODO: complete the go packages and installation
+        echo "install go and gorc"
         ;;
     * )
         echo "$1 is not valid command"
         echo "usage:"
-        echo "    $0 [bash|git|vim|python]"
+        echo "    $0 [zsh|bash|git|vim|nvim|os|mac|ubuntu|python]"
         ;;
 esac

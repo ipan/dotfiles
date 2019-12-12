@@ -1,12 +1,10 @@
-# ~/.bash_aliases
-
 # colors
 if [ "$TERM" != "dumb" ]; then
   alias grep='grep --color=auto'
   alias fgrep='fgrep --color=auto'
   alias egrep='egrep --color=auto'
 
-  if [ "$(uname)" == "Darwin" ]; then
+  if [ "$(uname)" = "Darwin" ]; then
     export LSCOLORS=dxfxcxdxbxegedabagacad
     alias ls='ls -CG'
   else
@@ -14,7 +12,7 @@ if [ "$TERM" != "dumb" ]; then
   fi
 fi
 
-if [ "$(uname)" == "Darwin" ]; then
+if [ "$(uname)" = "Darwin" ]; then
   alias flushdns='dscacheutil -flushcache;sudo killall -HUP mDNSResponder && echo DNS flushed'
   alias byobu='BYOBU_PYTHON=`which python3` byobu'
 fi
@@ -34,7 +32,7 @@ if [ -n $(which docker) ]; then
   # Delete all stopped containers and untagged images.
   alias dockerclean='dockercleanc || true && dockercleani'
 
-  if [ "$(uname)" == "Darwin" ]; then
+  if [ "$(uname)" = "Darwin" ]; then
     # Start docker on Mac
     alias dockermachine='eval $(docker-machine env)'
   fi
