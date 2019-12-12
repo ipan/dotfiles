@@ -7,6 +7,32 @@ if [ -f /etc/bashrc ]; then
   source /etc/bashrc
 fi
 
+export LC_ALL=en_US.UTF-8  
+export LANG=en_US.UTF-8
+
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+if [ -n $XDG_CONFIG_HOME ]; then
+	export XDG_CONFIG_HOME="$HOME/.config"
+fi
+
+if [ -n $XDG_DATA_HOME ]; then
+	export XDG_DATA_HOME="$HOME/.local/share"
+fi
+
+# path
+if [ -d $HOME/go/bin ]; then
+    export PATH="$HOME/go/bin:$PATH"
+fi
+
+if [ -d $HOME/.local/bin ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+
+if [ -d $HOME/bin ]; then
+    export PATH="$HOME/bin:$PATH"
+fi
+
 # shell options
 shopt -s histappend
 shopt -s checkwinsize
@@ -67,6 +93,8 @@ case "$TERM" in
   *)
     ;;
 esac
+
+[ -f ~/.aliases ] && source ~/.aliases
 
 [ -r "${HOME}/.byobu/prompt" ] && . "${HOME}/.byobu/prompt"   #byobu-prompt#
 
