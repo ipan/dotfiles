@@ -17,8 +17,9 @@ if [ -d $HOME/go/bin ]; then
     export PATH="$HOME/go/bin:$PATH"
 fi
 
-if [ -d $HOME/.local/bin ]; then
-    export PATH="$HOME/.local/bin:$PATH"
+py3_user_bin=$(python3 -m site --user-base)
+if [ -d $py3_user_bin/bin ]; then
+    export PATH="$py3_user_bin/bin:$PATH"
 fi
 
 if [ -d $HOME/bin ]; then
@@ -35,7 +36,7 @@ else
 fi
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/ivan.pan/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,

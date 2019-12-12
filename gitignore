@@ -3,9 +3,10 @@
 .DS_Store
 
 # IDE
-.project
-.pydevproject
+.project/
+.pydevproject/
 .idea/
+.vscode/
 
 # Playgrounds
 timeline.xctimeline
