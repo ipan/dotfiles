@@ -89,7 +89,20 @@ install_python() {
 }
 
 setup_zsh() {
-    # TODO: install oh-my-zsh
+    if [ ! $(which zsh) ]; then
+        case $(detect_os) in
+            'macos' )
+                install_mac zsh
+                ;;
+            'ubuntu' )
+                install_ubuntu zsh
+                ;;
+        esac
+    fi
+
+    if [ ! -d "$HOME/.oh-my-zsh/" ]; then
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    fi 
 
     # ~/.zshrc
     # ~/.aliases
@@ -115,6 +128,7 @@ setup_bash() {
     # ~/.aliases
     linkme bashrc
     linkme aliases
+
     # remove old aliaes if found
     rm -rf "$XDG_CONFIG_HOME/.bash_profile"
     rm -rf "$XDG_CONFIG_HOME/bash/aliases"
@@ -131,6 +145,7 @@ setup_git() {
             install_ubuntu git
             ;;
     esac
+
     # ~/.config/git/{config,ignore}
     linkme gitconfig git config
     linkme gitignore git ignore
@@ -169,7 +184,6 @@ setup_macos() {
     byobu
     cmake
     ctags
-    curl
     gnu-sed
     htop
     jq
@@ -235,6 +249,18 @@ setup_python() {
     linkme pip.conf pip
 }
 
+uninstall_pip() {
+    pip3 freeze | grep '==' | cut -d '=' -f1 | tr '\n' ' ' | xargs sudo pip3 uninstall -y
+}
+
+usage() {
+    echo "usage:"
+    echo "    $0 [zsh|bash|git|vim|nvim|os|mac|ubuntu|python]"
+}
+
+if [ -z "$1" ]; then
+    usage
+fi
 
 case $1 in
     'zsh' )
@@ -264,13 +290,16 @@ case $1 in
     'python' )
         setup_python
         ;;
+    'clean-pip' )
+        uninstall_pip
+        ;;
     'go' )
         # TODO: complete the go packages and installation
-        echo "install go and gorc"
+        echo "[WIP] will be installing go and gorc"
         ;;
     * )
         echo "$1 is not valid command"
-        echo "usage:"
-        echo "    $0 [zsh|bash|git|vim|nvim|os|mac|ubuntu|python]"
+        usage
+        exit 1
         ;;
 esac

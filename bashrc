@@ -24,10 +24,10 @@ if [ -d $HOME/go/bin ]; then
     export PATH="$HOME/go/bin:$PATH"
 fi
 
-if [ -d $HOME/.local/bin ]; then
-    export PATH="$HOME/.local/bin:$PATH"
+py3_user_bin=$(python3 -m site --user-base)
+if [ -d $py3_user_bin/bin ]; then
+    export PATH="$py3_user_bin/bin:$PATH"
 fi
-
 
 if [ -d $HOME/bin ]; then
     export PATH="$HOME/bin:$PATH"
