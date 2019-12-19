@@ -24,6 +24,11 @@ if [ -d $HOME/go/bin ]; then
     export PATH="$HOME/go/bin:$PATH"
 fi
 
+
+if [ -d /snap/bin ]; then
+    export PATH="/snap/bin:$PATH"
+fi
+
 py3_user_bin=$(python3 -m site --user-base)
 if [ -d $py3_user_bin/bin ]; then
     export PATH="$py3_user_bin/bin:$PATH"
