@@ -80,9 +80,15 @@ let g:python3_host_prog = '/usr/bin/python3'
 " == vim plugins ==
 
 " Plug: install vim-plug if not found
-if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+if has('nvim')
+    let g:vim_plug_install_path = '~/.config/nvim/autoload/plug.vim'
+else
+    let g:vim_plug_install_path = '~/.vim/autoload/plug.vim'
+endif
+
+if empty(glob(vim_plug_install_path))
+  let g:vim_plug_github = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  execute "silent !curl -fLo " . g:vim_plug_install_path . " " . g:vim_plug_github
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
