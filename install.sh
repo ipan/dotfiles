@@ -59,11 +59,11 @@ detect_os() {
     fi
 
     os_name=$(awk -F= '/^NAME/{print $2}' /etc/os-release)
-    case $os_name in
+    case "$os_name" in
         "Ubuntu" )
             printf "ubuntu"
             ;;
-        "CentOS Linux" )
+        '"CentOS Linux"' )
             printf "centos"
             ;;
         "*" )
@@ -171,9 +171,11 @@ setup_nvim() {
             install_mac neovim
             install_python pynvim
             ;;
-        'ubuntu' )
+        'ubuntu' | 'centos' )
+            echo "install nvim"
             nvim_stable='https://github.com/neovim/neovim/releases/download/stable/nvim.appimage'
             mkdir -p ~/bin
+            rm -rf ~/bin/nvim
             wget -O ~/bin/nvim $nvim_stable
             chmod +x ~/bin/nvim
             ;;
