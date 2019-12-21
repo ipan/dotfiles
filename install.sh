@@ -177,7 +177,8 @@ setup_nvim() {
             mkdir -p ~/bin
             rm -rf ~/bin/nvim
             wget -O ~/bin/nvim $nvim_stable
-            chmod +x ~/bin/nvim
+            chmod u+x ~/bin/nvim
+            install_python pynvim
             ;;
     esac
         
