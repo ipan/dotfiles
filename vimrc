@@ -56,6 +56,10 @@ nnoremap <leader>P "+P
 vnoremap <leader>p "+p
 vnoremap <leader>P "+P
 
+" Delete trailing whitespaces
+" https://vim.fandom.com/wiki/Remove_unwanted_spaces
+nnoremap <silent> <F5> :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
+
 if has("nvim")
     " == neovim only ==
     " NeoVim Term: map <Esc> to exit terminal-mode
@@ -143,6 +147,9 @@ if has("python3")
 
   Plug 'wellle/tmux-complete.vim'
 endif
+" tmux integration
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'benmills/vimux'
 call plug#end()
 
 " colorschemes
@@ -168,3 +175,7 @@ if has("python3")
   let g:deoplete#enable_at_startup = 0
   autocmd InsertEnter * call deoplete#enable()
 endif
+
+" Vimux
+" Prompt for a command to run
+map <Leader>vp :VimuxPromptCommand<CR>

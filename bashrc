@@ -12,11 +12,11 @@ export LANG=en_US.UTF-8
 
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 if [ -n $XDG_CONFIG_HOME ]; then
-	export XDG_CONFIG_HOME="$HOME/.config"
+    export XDG_CONFIG_HOME="$HOME/.config"
 fi
 
 if [ -n $XDG_DATA_HOME ]; then
-	export XDG_DATA_HOME="$HOME/.local/share"
+    export XDG_DATA_HOME="$HOME/.local/share"
 fi
 
 # path
@@ -61,7 +61,7 @@ fi
 brewdir=''
 which brew > /dev/null 2>&1
 if [ $? == 0 ]; then
-	brewdir=$(brew --prefix)
+    brewdir=$(brew --prefix)
 fi
 
 bash_completion="${brewdir}/etc/bash_completion"
