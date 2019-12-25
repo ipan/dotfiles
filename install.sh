@@ -9,7 +9,7 @@ if [ -n $XDG_DATA_HOME ]; then
     export XDG_DATA_HOME="$HOME/.local/share"
 fi
 
-echo "XDG_CONFIG_HOME: $XDG_CONFIG_HOME" 
+echo "XDG_CONFIG_HOME: $XDG_CONFIG_HOME"
 echo "XDG_DATA_HOME: $XDG_DATA_HOME"
 
 NODIR='__NODIR__'
@@ -29,7 +29,7 @@ linkme() {
         else
             dst="$XDG_CONFIG_HOME/$folder/$filename"
         fi
- 
+
         # mkdir if not exist
         pardir=$(dirname "${dst}")
         mkdir -vp "${pardir}"
@@ -102,10 +102,12 @@ setup_zsh() {
 
     if [ ! -d "$HOME/.oh-my-zsh/" ]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    fi 
+    fi
 
+		# ~/.zsh_profile
     # ~/.zshrc
     # ~/.aliases
+		linkme zsh_profile
     linkme zshrc
     linkme aliases
 
@@ -124,16 +126,29 @@ setup_bash() {
             ;;
     esac
 
+		# ~/.bash_profile
     # ~/.bashrc
     # ~/.aliases
+		linkme bash_profile
     linkme bashrc
     linkme aliases
 
     # remove old aliaes if found
-    rm -rf "$XDG_CONFIG_HOME/.bash_profile"
     rm -rf "$XDG_CONFIG_HOME/bash/aliases"
-    
+
     source $HOME/.bashrc
+}
+
+setup_tmux() {
+    # ~/.tmux.conf
+    linkme tmux.conf
+}
+
+setup_i3() {
+	# ~/.config/i3/config
+	# ~/.config/i3status/config
+	linkme i3.config i3 config
+	linkme i3status.config i3status config
 }
 
 setup_git() {
@@ -181,7 +196,7 @@ setup_nvim() {
             install_python pynvim
             ;;
     esac
-        
+
     # ~/.config/nvim/init.vim
     linkme vimrc nvim init.vim
 }
@@ -218,15 +233,17 @@ setup_ubuntu() {
 
     install_ubuntu ${pkg[@]}
 }
-    
+
 
 setup_os() {
     case $(detect_os) in
         'macos' )
             setup_macos
+            setup_nvim
             ;;
         'ubuntu' )
             setup_ubuntu
+            setup_vim
             ;;
     esac
 }
@@ -237,19 +254,19 @@ setup_python() {
             install_mac python3
             ;;
         'ubuntu' )
-            install_ubuntu python3 python3-pip 
+            install_ubuntu python3 python3-pip
             ;;
     esac
 
     # install basic python packages
     install_python black flake8 pipenv
-    
+
     # flake8
     linkme flake8 $NODIR
-    
+
     # pep8
     linkme pep8 $NODIR
-    
+
     # pip
     mac_config="$HOME/Library/Application Support"
     if [ -d "$mac_config" ]; then
@@ -301,6 +318,13 @@ case $1 in
         ;;
     'clean-pip' )
         uninstall_pip
+        ;;
+    'tmux' )
+        setup_tmux
+        ;;
+    'i3' )
+        # TODO: install i3 and i3status
+        echo setup_i3
         ;;
     'go' )
         # TODO: complete the go packages and installation
