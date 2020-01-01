@@ -323,8 +323,7 @@ case $1 in
         setup_tmux
         ;;
     'i3' )
-        # TODO: install i3 and i3status
-        echo setup_i3
+        setup_i3
         ;;
     'go' )
         # TODO: complete the go packages and installation
