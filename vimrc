@@ -92,7 +92,7 @@ endif
 
 if empty(glob(vim_plug_install_path))
   let g:vim_plug_github = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  execute "silent !curl -fLo " . g:vim_plug_install_path . " " . g:vim_plug_github
+  execute "silent !curl -fLo " . g:vim_plug_install_path . " " . g:vim_plug_github " --create-dirs"
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
@@ -111,7 +111,6 @@ Plug 'sheerun/vim-polyglot'
 Plug 'robertmeta/nofrils'
 Plug 'arzg/vim-corvine'
 Plug 'dracula/vim'
-Plug 'jdsimcoe/panic.vim'
 " status
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -153,7 +152,7 @@ Plug 'benmills/vimux'
 call plug#end()
 
 " colorschemes
-silent! colorscheme nofrils-dark
+silent! colorscheme nofrils-acme
 
 " airline-themes
 let g:airline_theme='minimalist'

@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+# da/sh does not support array
 
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 if [ -n $XDG_CONFIG_HOME ]; then
@@ -104,10 +105,10 @@ setup_zsh() {
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     fi
 
-		# ~/.zsh_profile
+    # ~/.zsh_profile
     # ~/.zshrc
     # ~/.aliases
-		linkme zsh_profile
+    linkme zsh_profile
     linkme zshrc
     linkme aliases
 
@@ -126,10 +127,10 @@ setup_bash() {
             ;;
     esac
 
-		# ~/.bash_profile
+    # ~/.bash_profile
     # ~/.bashrc
     # ~/.aliases
-		linkme bash_profile
+    linkme bash_profile
     linkme bashrc
     linkme aliases
 
@@ -145,10 +146,10 @@ setup_tmux() {
 }
 
 setup_i3() {
-	# ~/.config/i3/config
-	# ~/.config/i3status/config
-	linkme i3.config i3 config
-	linkme i3status.config i3status config
+    # ~/.config/i3/config
+    # ~/.config/i3status/config
+    linkme i3.config i3 config
+    linkme i3status.config i3status config
 }
 
 setup_git() {
@@ -175,6 +176,10 @@ setup_vim() {
             install_ubuntu vim
             ;;
     esac
+
+    # install python pacakges for vim plugins
+    install_python pynvim
+
     # ~/.vimrc
     linkme vimrc
 }
@@ -184,7 +189,6 @@ setup_nvim() {
     case $(detect_os) in
         'macos' )
             install_mac neovim
-            install_python pynvim
             ;;
         'ubuntu' | 'centos' )
             echo "install nvim"
@@ -193,9 +197,11 @@ setup_nvim() {
             rm -rf ~/bin/nvim
             wget -O ~/bin/nvim $nvim_stable
             chmod u+x ~/bin/nvim
-            install_python pynvim
             ;;
     esac
+
+    # install python packages for nvim plugins
+    install_python pynvim
 
     # ~/.config/nvim/init.vim
     linkme vimrc nvim init.vim
