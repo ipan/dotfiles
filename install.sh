@@ -61,7 +61,7 @@ detect_os() {
 
     os_name=$(awk -F= '/^NAME/{print $2}' /etc/os-release)
     case "$os_name" in
-        "Ubuntu" )
+        '"Ubuntu"' )
             printf "ubuntu"
             ;;
         '"CentOS Linux"' )
@@ -82,7 +82,7 @@ install_mac() {
 }
 
 install_ubuntu() {
-    apt-get install --no-upgrade --assume-yes $@
+    sudo apt-get install --no-upgrade --assume-yes $@
 }
 
 install_python() {
@@ -240,20 +240,6 @@ setup_ubuntu() {
     install_ubuntu ${pkg[@]}
 }
 
-
-setup_os() {
-    case $(detect_os) in
-        'macos' )
-            setup_macos
-            setup_nvim
-            ;;
-        'ubuntu' )
-            setup_ubuntu
-            setup_vim
-            ;;
-    esac
-}
-
 setup_python() {
     case $(detect_os) in
         'macos' )
@@ -281,13 +267,31 @@ setup_python() {
     linkme pip.conf pip
 }
 
+setup_os() {
+    setup_git
+    setup_python
+
+    case $(detect_os) in
+        'macos' )
+            setup_macos
+            setup_nvim
+            setup_zsh
+            ;;
+        'ubuntu' )
+            setup_ubuntu
+            setup_vim
+            setup_bash
+            ;;
+    esac
+}
+
 uninstall_pip() {
     pip3 freeze | grep '==' | cut -d '=' -f1 | tr '\n' ' ' | xargs sudo pip3 uninstall -y
 }
 
 usage() {
     echo "usage:"
-    echo "    $0 [zsh|bash|git|vim|nvim|os|mac|ubuntu|python]"
+    echo "    $0 [zsh|bash|git|vim|nvim|os|mac|ubuntu|python|i3|tmux]"
 }
 
 if [ -z "$1" ]; then
@@ -317,6 +321,7 @@ case $1 in
         setup_macos
         ;;
     'ubuntu' )
+        # need sudo
         setup_ubuntu
         ;;
     'python' )
@@ -326,9 +331,11 @@ case $1 in
         uninstall_pip
         ;;
     'tmux' )
+        # config only
         setup_tmux
         ;;
     'i3' )
+        # config only
         setup_i3
         ;;
     'go' )
