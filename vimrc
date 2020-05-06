@@ -130,7 +130,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
 " python
 Plug 'tweekmonster/impsort.vim'
 if executable("black") && has("python3")
-    Plug 'psf/black'
+    Plug 'psf/black', { 'tag': '19.10b0' }
 endif
 if has("python3")
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -152,7 +152,7 @@ Plug 'benmills/vimux'
 call plug#end()
 
 " colorschemes
-silent! colorscheme nofrils-acme
+silent! colorscheme dracula
 
 " airline-themes
 let g:airline_theme='minimalist'
