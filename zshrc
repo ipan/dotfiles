@@ -12,7 +12,18 @@ if [ -n $XDG_DATA_HOME ]; then
 	export XDG_DATA_HOME="$HOME/.local/share"
 fi
 
+# Java Home
+jdk_base='/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk'
+if [ -d $jdk_base ]; then
+    export JAVA_HOME="$jdk_base/Contents/Home"
+fi
+
 # path
+maven_base='/opt/apache-maven-3.6.3/'
+if [ -d $maven_base ]; then
+    export PATH="$maven_base/bin:$PATH"
+fi
+
 if [ -d $HOME/go/bin ]; then
     export PATH="$HOME/go/bin:$PATH"
 fi
