@@ -12,7 +12,18 @@ if [ -n $XDG_DATA_HOME ]; then
 	export XDG_DATA_HOME="$HOME/.local/share"
 fi
 
+# Java Home
+jdk_base='/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk'
+if [ -d $jdk_base ]; then
+    export JAVA_HOME="$jdk_base/Contents/Home"
+fi
+
 # path
+maven_base='/opt/apache-maven-3.6.3/'
+if [ -d $maven_base ]; then
+    export PATH="$maven_base/bin:$PATH"
+fi
+
 if [ -d $HOME/go/bin ]; then
     export PATH="$HOME/go/bin:$PATH"
 fi
@@ -20,6 +31,15 @@ fi
 py3_user_bin=$(python3 -m site --user-base)
 if [ -d $py3_user_bin/bin ]; then
     export PATH="$py3_user_bin/bin:$PATH"
+fi
+
+if [ -d $HOME/.pyenv ]; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+fi
+
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init -)"
 fi
 
 if [ -d $HOME/bin ]; then
