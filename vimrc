@@ -56,6 +56,10 @@ nnoremap <leader>P "+P
 vnoremap <leader>p "+p
 vnoremap <leader>P "+P
 
+" Delete trailing whitespaces
+" https://vim.fandom.com/wiki/Remove_unwanted_spaces
+nnoremap <silent> <F5> :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
+
 if has("nvim")
     " == neovim only ==
     " NeoVim Term: map <Esc> to exit terminal-mode
@@ -88,7 +92,7 @@ endif
 
 if empty(glob(vim_plug_install_path))
   let g:vim_plug_github = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  execute "silent !curl -fLo " . g:vim_plug_install_path . " " . g:vim_plug_github
+  execute "silent !curl -fLo " . g:vim_plug_install_path . " " . g:vim_plug_github " --create-dirs"
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
@@ -107,7 +111,6 @@ Plug 'sheerun/vim-polyglot'
 Plug 'robertmeta/nofrils'
 Plug 'arzg/vim-corvine'
 Plug 'dracula/vim'
-Plug 'jdsimcoe/panic.vim'
 " status
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -127,7 +130,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
 " python
 Plug 'tweekmonster/impsort.vim'
 if executable("black") && has("python3")
-    Plug 'psf/black'
+    Plug 'psf/black', { 'tag': '19.10b0' }
 endif
 if has("python3")
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -143,10 +146,13 @@ if has("python3")
 
   Plug 'wellle/tmux-complete.vim'
 endif
+" tmux integration
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'benmills/vimux'
 call plug#end()
 
 " colorschemes
-silent! colorscheme nofrils-dark
+silent! colorscheme dracula
 
 " airline-themes
 let g:airline_theme='minimalist'
@@ -168,3 +174,7 @@ if has("python3")
   let g:deoplete#enable_at_startup = 0
   autocmd InsertEnter * call deoplete#enable()
 endif
+
+" Vimux
+" Prompt for a command to run
+map <Leader>vp :VimuxPromptCommand<CR>

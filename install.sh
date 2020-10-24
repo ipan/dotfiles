@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+# da/sh does not support array
 
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 if [ -n $XDG_CONFIG_HOME ]; then
@@ -9,7 +10,7 @@ if [ -n $XDG_DATA_HOME ]; then
     export XDG_DATA_HOME="$HOME/.local/share"
 fi
 
-echo "XDG_CONFIG_HOME: $XDG_CONFIG_HOME" 
+echo "XDG_CONFIG_HOME: $XDG_CONFIG_HOME"
 echo "XDG_DATA_HOME: $XDG_DATA_HOME"
 
 NODIR='__NODIR__'
@@ -29,7 +30,7 @@ linkme() {
         else
             dst="${XDG_CONFIG_HOME}/${folder}/${filename}"
         fi
- 
+
         # mkdir if not exist
         pardir=$(dirname "$dst")
         eval mkdir -vp "$pardir"
@@ -60,7 +61,7 @@ detect_os() {
 
     os_name=$(awk -F= '/^NAME/{print $2}' /etc/os-release)
     case "$os_name" in
-        "Ubuntu" )
+        '"Ubuntu"' )
             printf "ubuntu"
             ;;
         '"CentOS Linux"' )
@@ -81,7 +82,7 @@ install_mac() {
 }
 
 install_ubuntu() {
-    apt-get install --no-upgrade --assume-yes $@
+    sudo apt-get install --no-upgrade --assume-yes $@
 }
 
 install_python() {
@@ -102,10 +103,12 @@ setup_zsh() {
 
     if [ ! -d "$HOME/.oh-my-zsh/" ]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    fi 
+    fi
 
+    # ~/.zsh_profile
     # ~/.zshrc
     # ~/.aliases
+    linkme zsh_profile
     linkme zshrc
     linkme aliases
 
@@ -124,16 +127,29 @@ setup_bash() {
             ;;
     esac
 
+    # ~/.bash_profile
     # ~/.bashrc
     # ~/.aliases
+    linkme bash_profile
     linkme bashrc
     linkme aliases
 
     # remove old aliaes if found
-    rm -rf "$XDG_CONFIG_HOME/.bash_profile"
     rm -rf "$XDG_CONFIG_HOME/bash/aliases"
-    
+
     source $HOME/.bashrc
+}
+
+setup_tmux() {
+    # ~/.tmux.conf
+    linkme tmux.conf
+}
+
+setup_i3() {
+    # ~/.config/i3/config
+    # ~/.config/i3status/config
+    linkme i3.config i3 config
+    linkme i3status.config i3status config
 }
 
 setup_git() {
@@ -160,6 +176,10 @@ setup_vim() {
             install_ubuntu vim
             ;;
     esac
+
+    # install python pacakges for vim plugins
+    install_python pynvim
+
     # ~/.vimrc
     linkme vimrc
 }
@@ -169,7 +189,6 @@ setup_nvim() {
     case $(detect_os) in
         'macos' )
             install_mac neovim
-            install_python pynvim
             ;;
         'ubuntu' | 'centos' )
             echo "install nvim"
@@ -178,10 +197,12 @@ setup_nvim() {
             rm -rf ~/bin/nvim
             wget -O ~/bin/nvim $nvim_stable
             chmod u+x ~/bin/nvim
-            install_python pynvim
             ;;
     esac
-        
+
+    # install python packages for nvim plugins
+    install_python pynvim
+
     # ~/.config/nvim/init.vim
     linkme vimrc nvim init.vim
 }
@@ -218,18 +239,6 @@ setup_ubuntu() {
 
     install_ubuntu ${pkg[@]}
 }
-    
-
-setup_os() {
-    case $(detect_os) in
-        'macos' )
-            setup_macos
-            ;;
-        'ubuntu' )
-            setup_ubuntu
-            ;;
-    esac
-}
 
 setup_python() {
     case $(detect_os) in
@@ -237,21 +246,39 @@ setup_python() {
             install_mac python3
             ;;
         'ubuntu' )
-            install_ubuntu python3 python3-pip 
+            install_ubuntu python3 python3-pip
             ;;
     esac
 
     # install basic python packages
     install_python black flake8 pipenv
-    
+
     # flake8
     linkme flake8 $NODIR
-    
+
     # pep8
     linkme pep8 $NODIR
-    
+
     # pip
     linkme pip.conf pip
+}
+
+setup_os() {
+    setup_git
+    setup_python
+
+    case $(detect_os) in
+        'macos' )
+            setup_macos
+            setup_nvim
+            setup_zsh
+            ;;
+        'ubuntu' )
+            setup_ubuntu
+            setup_vim
+            setup_bash
+            ;;
+    esac
 }
 
 uninstall_pip() {
@@ -260,7 +287,7 @@ uninstall_pip() {
 
 usage() {
     echo "usage:"
-    echo "    $0 [zsh|bash|git|vim|nvim|os|mac|ubuntu|python]"
+    echo "    $0 [zsh|bash|git|vim|nvim|os|mac|ubuntu|python|i3|tmux]"
 }
 
 if [ -z "$1" ]; then
@@ -290,6 +317,7 @@ case $1 in
         setup_macos
         ;;
     'ubuntu' )
+        # need sudo
         setup_ubuntu
         ;;
     'python' )
@@ -297,6 +325,14 @@ case $1 in
         ;;
     'clean-pip' )
         uninstall_pip
+        ;;
+    'tmux' )
+        # config only
+        setup_tmux
+        ;;
+    'i3' )
+        # config only
+        setup_i3
         ;;
     'go' )
         # TODO: complete the go packages and installation
