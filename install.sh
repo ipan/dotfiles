@@ -25,31 +25,31 @@ linkme() {
 
     if [ -n "$folder" ]; then
         if [ "$folder" == "$NODIR" ]; then
-            dst="$XDG_CONFIG_HOME/$filename"
+            dst="${XDG_CONFIG_HOME}/${filename}"
         else
-            dst="$XDG_CONFIG_HOME/$folder/$filename"
+            dst="${XDG_CONFIG_HOME}/${folder}/${filename}"
         fi
  
         # mkdir if not exist
-        pardir=$(dirname "${dst}")
-        mkdir -vp "${pardir}"
+        pardir=$(dirname "$dst")
+        eval mkdir -vp "$pardir"
     else
-        dst="$HOME/.$filename"
+        dst="${HOME}/.${filename}"
     fi
 
     # remove existing symlink
-    if [ -L "${dst}" ]; then
+    if [ -L "$dst" ]; then
     echo "Removing:"
-        rm -v "${dst}"
+        eval rm -v "$dst"
     fi
 
     # backup the files
-    if [ -f "${dst}" ]; then
+    if [ -f "$dst" ]; then
     echo "Backing up:"
-        mv -v "${dst}" $rc.old
+        eval mv -v "$dst" ${rc}.old
     fi
 
-    ln -svf $(pwd)/$rc ${dst}
+    eval ln -svf "$(pwd)/${rc}" "$dst"
 }
 
 detect_os() {
@@ -251,10 +251,6 @@ setup_python() {
     linkme pep8 $NODIR
     
     # pip
-    mac_config="$HOME/Library/Application Support"
-    if [ -d "$mac_config" ]; then
-        XDG_CONFIG_HOME="$mac_config"
-    fi
     linkme pip.conf pip
 }
 

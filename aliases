@@ -43,5 +43,6 @@ fi
 alias gitwork='git config user.email ivan.pan@thermofisher.com'
 
 
-# vi/vim
+# vi/vim/nvim
 [ -f "$(which vim)" ] && alias vi=$(which vim)
+[ -f "$(which nvim)" ] && alias vim=$(which nvim)
