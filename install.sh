@@ -112,8 +112,9 @@ setup_zsh() {
     linkme zshrc
     linkme aliases
 
-    # activate new settings
-    source $HOME/.zshrc
+    echo ""
+    echo "Run the follow to activate the new settings"
+    echo " source ${HOME}/.zshrc"
 }
 
 setup_bash() {
@@ -230,7 +231,6 @@ setup_ubuntu() {
     cmake
     ctags
     curl
-    git
     htop
     jq
     silversearcher-ag
@@ -243,10 +243,10 @@ setup_ubuntu() {
 setup_python() {
     case $(detect_os) in
         'macos' )
-            install_mac python3
+            install_mac pyenv
             ;;
         'ubuntu' )
-            install_ubuntu python3 python3-pip
+            install_ubuntu python3-pip
             ;;
     esac
 
@@ -285,62 +285,35 @@ uninstall_pip() {
     pip3 freeze | grep '==' | cut -d '=' -f1 | tr '\n' ' ' | xargs sudo pip3 uninstall -y
 }
 
+maincmd=$(basename $0)
+
 usage() {
-    echo "usage:"
-    echo "    $0 [zsh|bash|git|vim|nvim|os|mac|ubuntu|python|i3|tmux]"
+    echo "Usage: $maincmd <subcommand> [options]\n"
+    echo "Subcommands:"
+    echo "  os [macos|ubuntu]: set up system based on OS. (Mac or Ubuntu)"
+    echo "  [z|ba]sh: set up zsh (Mac) or bash (Ubuntu)"
+    echo "  git: install and setup git"
+    echo "  python: install python packages"
+    echo "  [nvim|vim]: install and setup (neo)vim"
+    echo "  i3: setup i3"
+    echo "  tmux: setup tmux"
 }
 
-if [ -z "$1" ]; then
-    usage
-fi
 
-case $1 in
-    'zsh' )
-        setup_zsh
-        ;;
-    'bash' )
-        setup_bash
-        ;;
-    'git' )
-        setup_git
-        ;;
-    'vim' )
-        setup_vim
-        ;;
-    'nvim' )
-        setup_nvim
-        ;;
-    'os' )
-        setup_os
-        ;;
-    'mac' )
-        setup_macos
-        ;;
-    'ubuntu' )
-        # need sudo
-        setup_ubuntu
-        ;;
-    'python' )
-        setup_python
+subcmd=$1
+case $subcmd in
+    '' | '-h' | '--help' )
+        usage
         ;;
     'clean-pip' )
         uninstall_pip
         ;;
-    'tmux' )
-        # config only
-        setup_tmux
-        ;;
-    'i3' )
-        # config only
-        setup_i3
-        ;;
-    'go' )
-        # TODO: complete the go packages and installation
-        echo "[WIP] will be installing go and gorc"
-        ;;
     * )
-        echo "$1 is not valid command"
-        usage
-        exit 1
+        shift
+        setup_${subcmd} $@
+        if [ $? = 127 ]; then
+            echo "Error: '$subcmd' is not valid subcommand." >&2
+            echo "       Run $maincmd --help"
+        fi
         ;;
 esac

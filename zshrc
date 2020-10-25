@@ -46,8 +46,14 @@ if [ -d $HOME/bin ]; then
     export PATH="$HOME/bin:$PATH"
 fi
 
-# # editor
-export EDITOR=vi
+# editor
+if [ -n $(which nvim) ]; then
+  export EDITOR=nvim
+elif [ -n $(which vim) ]; then
+  export EDITOR=vim
+else
+  export EDITOR=vi
+fi
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
