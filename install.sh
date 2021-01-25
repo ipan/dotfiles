@@ -90,17 +90,6 @@ install_python() {
 }
 
 setup_zsh() {
-    if [ ! $(which zsh) ]; then
-        case $(detect_os) in
-            'macos' )
-                install_mac zsh
-                ;;
-            'ubuntu' )
-                install_ubuntu zsh
-                ;;
-        esac
-    fi
-
     if [ ! -d "$HOME/.oh-my-zsh/" ]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     fi
@@ -154,30 +143,12 @@ setup_i3() {
 }
 
 setup_git() {
-    case $(detect_os) in
-        'macos' )
-            install_mac git
-            ;;
-        'ubuntu' )
-            install_ubuntu git
-            ;;
-    esac
-
     # ~/.config/git/{config,ignore}
     linkme gitconfig git config
     linkme gitignore git ignore
 }
 
 setup_vim() {
-    case $(detect_os) in
-        'macos' )
-            install_mac vim
-            ;;
-        'ubuntu' )
-            install_ubuntu vim
-            ;;
-    esac
-
     # install python pacakges for vim plugins
     install_python pynvim
 
@@ -186,21 +157,6 @@ setup_vim() {
 }
 
 setup_nvim() {
-    # https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
-    case $(detect_os) in
-        'macos' )
-            install_mac neovim
-            ;;
-        'ubuntu' | 'centos' )
-            echo "install nvim"
-            nvim_stable='https://github.com/neovim/neovim/releases/download/stable/nvim.appimage'
-            mkdir -p ~/bin
-            rm -rf ~/bin/nvim
-            wget -O ~/bin/nvim $nvim_stable
-            chmod u+x ~/bin/nvim
-            ;;
-    esac
-
     # install python packages for nvim plugins
     install_python pynvim
 
@@ -270,7 +226,7 @@ setup_os() {
     case $(detect_os) in
         'macos' )
             setup_macos
-            setup_nvim
+            setup_vim
             setup_zsh
             ;;
         'ubuntu' )
