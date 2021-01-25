@@ -5,11 +5,11 @@ export LANG=en_US.UTF-8
 
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 if [ -n $XDG_CONFIG_HOME ]; then
-	export XDG_CONFIG_HOME="$HOME/.config"
+    export XDG_CONFIG_HOME="$HOME/.config"
 fi
 
 if [ -n $XDG_DATA_HOME ]; then
-	export XDG_DATA_HOME="$HOME/.local/share"
+    export XDG_DATA_HOME="$HOME/.local/share"
 fi
 
 # Java Home
@@ -47,13 +47,12 @@ if [ -d $HOME/bin ]; then
 fi
 
 # editor
-if [ -n $(which nvim) ]; then
-  export EDITOR=nvim
-elif [ -n $(which vim) ]; then
-  export EDITOR=vim
-else
-  export EDITOR=vi
-fi
+for editor in $(which nvim vim vi); do
+    if [ -f $editor ]; then
+        export EDITOR=$editor
+        break
+    fi
+done
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
