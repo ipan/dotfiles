@@ -154,6 +154,11 @@ call plug#end()
 " colorschemes
 silent! colorscheme dracula
 
+" python 3
+let g:python3_host_prog='/usr/local/bin/python3'
+let g:loaded_python_provider = 0
+let g:python_host_prog = ''
+
 " airline-themes
 let g:airline_theme='minimalist'
 
