@@ -1,6 +1,5 @@
 [user]
     name = Ivan Pan
-    email = me@ivanpan.com
 
 [core]
     editor = $EDITOR
