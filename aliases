@@ -36,12 +36,20 @@ if [ -f "$(which docker)" ]; then
     # Start docker on Mac
     alias dockermachine='eval $(docker-machine env)'
   fi
+
+  # killing docker desktop
+  function kdo() {
+      ps ax|grep -i docker|egrep -iv 'grep|com.docker.vmnetd'|awk '{print $1}'|xargs kill
+    }
 fi
 
 
-# git relate
+# git related
 alias gitwork='git config user.email ivan.pan@thermofisher.com'
+alias gitpersonal='git config user.email me@ivanpan.com'
 
+# python
+alias python="python3"
 
 # vi/vim/nvim
 [ -f "$(which vim)" ] && alias vi=$(which vim)
