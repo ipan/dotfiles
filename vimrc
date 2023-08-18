@@ -77,10 +77,6 @@ if exists('&inccommand')
   set inccommand=split
 endif
 
-" Python
-let g:python_host_prog  = '/usr/bin/python2'
-let g:python3_host_prog = '/usr/bin/python3'
-
 " == vim plugins ==
 
 " Plug: install vim-plug if not found
@@ -104,58 +100,60 @@ endif
 
 " Plug: vim plugins, use single quote
 call plug#begin(vim_plug_dir)
+
 " general settings
 Plug 'tpope/vim-sensible'
+
 " colorscheme
 Plug 'sheerun/vim-polyglot'
 Plug 'robertmeta/nofrils'
 Plug 'arzg/vim-corvine'
 Plug 'dracula/vim'
+
 " status
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+
 " git
 Plug 'tpope/vim-fugitive'
+
 " gutter
 Plug 'airblade/vim-gitgutter'
 Plug 'myusuf3/numbers.vim'
+
 " code search and navigation
 Plug 'haya14busa/incsearch.vim'
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'majutsushi/tagbar'
+
 " file search and navgigation
 Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
+
 " python
-Plug 'tweekmonster/impsort.vim'
 if executable("black") && has("python3")
-    Plug 'psf/black', { 'tag': '19.10b0' }
+    Plug 'psf/black'
 endif
-if has("python3")
+if has("nvim") && has("python3")
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-
-  if !has("nvim")
-    " below needed for vim
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-  endif
-
   Plug 'deoplete-plugins/deoplete-jedi'
+  Plug 'deoplete-plugins/deoplete-clang'
+  Plug 'deoplete-plugins/deoplete-go'
+  Plug 'deoplete-plugins/deoplete-make'
+  Plug 'deoplete-plugins/deoplete-terminal'
   Plug 'deoplete-plugins/deoplete-zsh'
-
-  Plug 'wellle/tmux-complete.vim'
+  Plug 'deoplete-plugins/deoplete-docker'
+  Plug 'deoplete-plugins/deoplete-tag'
+  
 endif
-" tmux integration
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'benmills/vimux'
 call plug#end()
 
 " colorschemes
 silent! colorscheme dracula
 
-" python 3
-let g:python3_host_prog='/usr/local/bin/python3'
+" python 3 only
+let g:python3_host_prog='python3'
 let g:loaded_python_provider = 0
 let g:python_host_prog = ''
 
@@ -168,10 +166,7 @@ nmap <Leader>rt :TagbarToggle<CR>
 " NERDTree:
 map <C-n> :NERDTreeToggle<CR>
 
-" Black
-if executable("black") && has("python3")
-    let g:black_virtualenv = '/usr/local/bin/'
-endif
+
 
 " Deoplete
 " Enable deoplete when InsertEnter.
