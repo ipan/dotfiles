@@ -46,6 +46,14 @@ if [ -d $HOME/bin ]; then
     export PATH="$HOME/bin:$PATH"
 fi
 
+# functions
+
+function editknownhosts () {
+    ssh-keygen -f "/Users/ipan/.ssh/known_hosts" -R "$1"
+}
+
+
+
 # editor
 for editor in $(which nvim vim vi); do
     if [ -f $editor ]; then
@@ -61,7 +69,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="refined"
+ZSH_THEME="apple"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -154,3 +162,5 @@ source $ZSH/oh-my-zsh.sh
 [ -f ~/.aliases ] && source ~/.aliases
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+source /Users/ipan/.docker/init-zsh.sh || true # Added by Docker Desktop
