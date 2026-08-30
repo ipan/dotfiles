@@ -160,6 +160,26 @@ setup_nvim() {
     linkme nvim/init.lua nvim init.lua
 }
 
+setup_zed() {
+    # Install Zed using its supported package source.
+    case "$(detect_os)" in
+        macos)
+            install_mac --cask zed
+            ;;
+        ubuntu)
+            install_ubuntu curl
+            curl -f https://zed.dev/install.sh | sh
+            ;;
+        *)
+            echo "Unsupported operating system for Zed setup: $(detect_os)" >&2
+            return 1
+            ;;
+    esac
+
+    # Link the shared Zed user settings.
+    linkme zed/settings.json zed settings.json
+}
+
 setup_macos() {
     local packages=(
         gh
@@ -219,7 +239,81 @@ install_asdf_ubuntu() {
     export PATH="$HOME/.local/bin:$PATH"
 }
 
+ensure_asdf_plugin() {
+    local plugin="$1"
+    local repository="$2"
+
+    if ! asdf plugin list | grep -qx "$plugin"; then
+        asdf plugin add "$plugin" "$repository"
+    fi
+}
+
+install_go() {
+    if command -v go >/dev/null 2>&1; then
+        return
+    fi
+
+    command -v curl >/dev/null 2>&1 || {
+        echo "curl is required to install Go." >&2
+        return 1
+    }
+
+    local go_os go_arch go_version archive tmpdir
+    case "$(uname -s)" in
+        Darwin) go_os="darwin" ;;
+        Linux) go_os="linux" ;;
+        *)
+            echo "Unsupported operating system for Go: $(uname -s)" >&2
+            return 1
+            ;;
+    esac
+    case "$(uname -m)" in
+        x86_64|amd64) go_arch="amd64" ;;
+        aarch64|arm64) go_arch="arm64" ;;
+        *)
+            echo "Unsupported architecture for Go: $(uname -m)" >&2
+            return 1
+            ;;
+    esac
+
+    if [[ -x "$HOME/.local/go/bin/go" ]]; then
+        export PATH="$HOME/.local/go/bin:$PATH"
+        return
+    fi
+
+    go_version="${GO_VERSION:-}"
+    if [[ -z "$go_version" ]]; then
+        go_version="$(curl -fsSL 'https://go.dev/VERSION?m=text' | sed -n '1p')"
+    fi
+    go_version="${go_version#go}"
+
+    tmpdir="$(mktemp -d)"
+    archive="$tmpdir/go.tar.gz"
+    curl -fsSL \
+        "https://go.dev/dl/go${go_version}.${go_os}-${go_arch}.tar.gz" \
+        -o "$archive"
+    mkdir -p "$HOME/.local"
+    tar -xzf "$archive" -C "$HOME/.local"
+    rm -rf "$tmpdir"
+    export PATH="$HOME/.local/go/bin:$PATH"
+}
+
+install_rustup() {
+    if command -v rustup >/dev/null 2>&1; then
+        return
+    fi
+
+    command -v curl >/dev/null 2>&1 || {
+        echo "curl is required to install rustup." >&2
+        return 1
+    }
+
+    curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile default
+    export PATH="$HOME/.cargo/bin:$PATH"
+}
+
 setup_sdk() {
+    # Install the runtime and Python-tool managers.
     case "$(detect_os)" in
         macos)
             install_mac asdf uv
@@ -238,6 +332,17 @@ setup_sdk() {
             ;;
     esac
 
+    # Configure asdf-managed runtime plugins.
+    ensure_asdf_plugin ant https://github.com/halcyon/asdf-ant.git
+    ensure_asdf_plugin java https://github.com/halcyon/asdf-java.git
+    ensure_asdf_plugin maven https://github.com/halcyon/asdf-maven.git
+    ensure_asdf_plugin nodejs https://github.com/asdf-vm/asdf-nodejs.git
+
+    # Install Go and rustup outside of asdf.
+    install_go
+    install_rustup
+
+    # Verify the Python environment and tool manager.
     if ! command -v uv >/dev/null 2>&1; then
         export PATH="$HOME/.local/bin:$PATH"
     fi
@@ -246,8 +351,31 @@ setup_sdk() {
         return 1
     }
 
+    # Install shared Python command-line tools.
     uv tool install --upgrade ruff
     linkme ruff.toml ruff ruff.toml
+}
+
+setup_ai_tools() {
+    command -v curl >/dev/null 2>&1 || {
+        echo "curl is required to install AI tools." >&2
+        return 1
+    }
+
+    # Install Pi, the terminal coding harness.
+    if ! command -v pi >/dev/null 2>&1; then
+        curl -fsSL https://pi.dev/install.sh | sh
+    fi
+
+    # Install omp (Oh My Pi), a terminal coding agent.
+    if ! command -v omp >/dev/null 2>&1; then
+        curl -fsSL https://omp.sh/install | sh
+    fi
+
+    # Install CodeGraph, the code-intelligence CLI.
+    if ! command -v codegraph >/dev/null 2>&1; then
+        curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh
+    fi
 }
 
 setup_os() {
@@ -273,6 +401,7 @@ setup_init() {
     setup_git
     setup_sdk
     setup_nvim
+    setup_zed
 
     case "$os" in
         macos)
@@ -298,8 +427,10 @@ Subcommands:
   zsh      Configure Zsh and Oh My Zsh
   bash     Configure Bash and bash-git-prompt
   git-config  Configure Git
-  sdk      Install asdf/uv, Ruff, and the SDK configuration
+  sdk      Install asdf plugins, Go, rustup, uv, Ruff, and SDK configuration
+  ai-tools Install Pi, omp, and CodeGraph
   nvim     Install Neovim and dependencies, then configure it
+  zed      Install Zed and configure its settings
   vim-config  Configure Vim
 EOF
 }
@@ -324,7 +455,9 @@ case "$subcmd" in
     bash) setup_bash ;;
     git-config) setup_git ;;
     sdk) setup_sdk ;;
+    ai-tools) setup_ai_tools ;;
     nvim) setup_nvim ;;
+    zed) setup_zed ;;
     vim-config) setup_vim ;;
     -h|--help) usage ;;
     *)

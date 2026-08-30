@@ -18,6 +18,11 @@ if [ -z "${XDG_DATA_HOME:-}" ]; then
     export XDG_DATA_HOME="$HOME/.local/share"
 fi
 
+# Add user-local tools such as asdf and uv.
+if [ -d "$HOME/.local/bin" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
 # Add asdf-managed tool shims.
 if command -v asdf >/dev/null 2>&1; then
   export ASDF_DATA_DIR="${ASDF_DATA_DIR:-$HOME/.asdf}"
@@ -27,6 +32,11 @@ fi
 # Configure Go's workspace and binary directory.
 export GOPATH="${GOPATH:-$HOME/go}"
 export GOBIN="${GOBIN:-$GOPATH/bin}"
+
+# Add the Go toolchain installed by the SDK setup.
+if [ -d "$HOME/.local/go/bin" ]; then
+    export PATH="$HOME/.local/go/bin:$PATH"
+fi
 
 # Add Go-installed binaries.
 if [ -d "$GOBIN" ]; then

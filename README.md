@@ -21,10 +21,12 @@ Individual components can also be installed:
 ```bash
 ./install.sh git-config
 ./install.sh nvim  # installs Neovim and its dependencies
+./install.sh zed   # installs Zed and links its settings
 ./install.sh vim-config
 ./install.sh zsh
 ./install.sh bash
 ./install.sh sdk
+./install.sh ai-tools  # installs Pi, omp, and CodeGraph
 ```
 
 Installer backups are stored in the ignored `tmp/backups/` directory with a
@@ -33,12 +35,54 @@ Installer backups are stored in the ignored `tmp/backups/` directory with a
 The `init` command:
 
 - Configures Git, shell files, and editor settings with symlinks.
-- Installs Neovim on macOS and Ubuntu.
-- Installs asdf and `uv`; manages language tools with asdf and Ruff with `uv tool install`.
+- Installs Neovim and Zed on macOS and Ubuntu.
+- Installs asdf and `uv`; asdf manages Node.js, Java, Maven, and Ant, while uv manages Python environments and tools across code repositories.
+- Installs Go using its official distribution and rustup using the official installer. Go manages its own toolchain and installed binaries; rustup manages Rust toolchains, `rustc`, `cargo`, and Rust components. Go and Rust are not installed through Homebrew or asdf.
 - Installs `fd`/`fd-find` and `ripgrep` for Neovim search.
 - Uses Zsh on macOS and Bash on Linux.
-- The `os` command installs system utilities without changing configuration files.
+- The `os` command installs system utilities without changing configuration files. The `sdk` command installs the language/tool managers, Go, and rustup's default stable toolchain.
 - Does not install or configure tmux, i3, Byobu, Flake8, pycodestyle, or Deoplete.
+
+## Toolchain management
+
+Each ecosystem owns its toolchain; do not install Go or Rust from Homebrew.
+
+- **asdf** manages selectable versions of Node.js, Java, Maven, and Ant. Set a
+  machine default in `~/.tool-versions` with `asdf set -u <plugin> <version>`;
+  set a project-specific version with `asdf set <plugin> <version>` from that
+  project. asdf reads the nearest `.tool-versions` while walking up from the
+  current directory, and its shims select the configured runtime.
+- **uv** manages Python interpreters, project virtual environments, dependency
+  resolution, and isolated CLI tools across repositories. Use `uv sync` (or
+  `uv run`) in a Python project and `uv tool install <tool>` for a globally
+  available Python CLI such as Ruff.
+- **Go** manages its own compiler toolchain and project dependencies. The SDK
+  installer downloads the current official release; `go.mod` declares the
+  language version for a project, and `go install` places user binaries in
+  `GOBIN` (default: `~/go/bin`).
+- **rustup** installs and selects Rust toolchains, which provide `rustc`,
+  `cargo`, `rustfmt`, and Clippy. The SDK installer bootstraps rustup with its
+  default stable toolchain. Projects can select a toolchain with
+  `rust-toolchain.toml`.
+
+The `sdk` installer installs asdf and uv; configures the Node.js, Java, Maven,
+and Ant asdf plugins; installs the latest Go release (or `GO_VERSION` when set)
+and rustup's default stable toolchain; then installs Ruff with uv.
+
+## AI tools
+
+`./install.sh ai-tools` installs the following optional terminal tools via their
+official installers. It skips a tool that is already available on `PATH`.
+
+- [Pi](https://pi.dev/) — terminal coding harness.
+- [omp](https://omp.sh/) (Oh My Pi) — terminal coding agent.
+- [CodeGraph](https://github.com/colbymchenry/codegraph) — code-intelligence CLI.
+
+## Zed
+
+`./install.sh zed` installs Zed through Homebrew on macOS and Zed's official
+installer on Ubuntu. It links [`zed/settings.json`](zed/settings.json) to
+`$XDG_CONFIG_HOME/zed/settings.json` (normally `~/.config/zed/settings.json`).
 
 ## Neovim
 
