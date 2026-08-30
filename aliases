@@ -44,8 +44,10 @@ fi
 
 
 # git related
-alias gitwork='git config user.email [redacted-email]'
-alias gitpersonal='git config user.email [redacted-email]'
+# Set a repository-local Git email without storing an address in these dotfiles.
+git-set-email() {
+  git config user.email "$1"
+}
 
 # python
 alias python="python3"

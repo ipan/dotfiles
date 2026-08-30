@@ -157,19 +157,3 @@ vi -> nvim
 vim -> nvim
 ```
 
-## Git email
-
-`set-git-email.sh` sets the local Git email for repositories under `~/Projects`.
-It defaults to `[redacted-email]`:
-
-```bash
-./set-git-email.sh
-```
-
-An alternate directory or email can be supplied:
-
-```bash
-./set-git-email.sh /path/to/projects [redacted-email]
-```
-
-Existing commits are not changed.
