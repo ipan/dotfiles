@@ -1,275 +1,335 @@
-#!/bin/bash
-# da/sh does not support array
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-if [ -n $XDG_CONFIG_HOME ]; then
-    export XDG_CONFIG_HOME="$HOME/.config"
-fi
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 
-if [ -n $XDG_DATA_HOME ]; then
-    export XDG_DATA_HOME="$HOME/.local/share"
-fi
-
-echo "XDG_CONFIG_HOME: $XDG_CONFIG_HOME"
-echo "XDG_DATA_HOME: $XDG_DATA_HOME"
+# XDG Base Directory defaults.
+: "${XDG_CONFIG_HOME:=$HOME/.config}"
+: "${XDG_DATA_HOME:=$HOME/.local/share}"
+export XDG_CONFIG_HOME XDG_DATA_HOME
 
 NODIR='__NODIR__'
+BACKUP_DIR="$SCRIPT_DIR/tmp/backups"
+BACKUP_TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 
 linkme() {
-    rc=$1
-    folder=$2
-    filename=$3
+    local rc="$1"
+    local folder="${2:-}"
+    local filename="${3:-$rc}"
+    local dst source backup backup_name
 
-    if [ -z "$filename" ]; then
-        filename="$rc"
+    source="$SCRIPT_DIR/$rc"
+    if [[ ! -f "$source" ]]; then
+        echo "Error: configuration file not found: $source" >&2
+        return 1
     fi
 
-    if [ -n "$folder" ]; then
-        if [ "$folder" == "$NODIR" ]; then
-            dst="${XDG_CONFIG_HOME}/${filename}"
+    if [[ -n "$folder" ]]; then
+        if [[ "$folder" == "$NODIR" ]]; then
+            dst="$XDG_CONFIG_HOME/$filename"
         else
-            dst="${XDG_CONFIG_HOME}/${folder}/${filename}"
+            dst="$XDG_CONFIG_HOME/$folder/$filename"
         fi
-
-        # mkdir if not exist
-        pardir=$(dirname "$dst")
-        eval mkdir -vp "$pardir"
     else
-        dst="${HOME}/.${filename}"
+        dst="$HOME/.$filename"
     fi
 
-    # remove existing symlink
-    if [ -L "$dst" ]; then
-    echo "Removing:"
-        eval rm -v "$dst"
+    mkdir -p "$(dirname "$dst")"
+
+    if [[ -L "$dst" ]]; then
+        rm -f "$dst"
+    elif [[ -e "$dst" ]]; then
+        mkdir -p "$BACKUP_DIR"
+        backup_name="$(basename "$dst").${BACKUP_TIMESTAMP}.bak"
+        backup="$BACKUP_DIR/$backup_name"
+        mv "$dst" "$backup"
+        echo "Backed up $dst to $backup"
     fi
 
-    # backup the files
-    if [ -f "$dst" ]; then
-    echo "Backing up:"
-        eval mv -v "$dst" ${rc}.old
-    fi
-
-    eval ln -svf "$(pwd)/${rc}" "$dst"
+    ln -s "$source" "$dst"
+    echo "Linked $dst -> $source"
 }
 
 detect_os() {
-    if [ "$(uname)" = "Darwin" ]; then
-        printf "macos"
-        return
-    fi
-
-    os_name=$(awk -F= '/^NAME/{print $2}' /etc/os-release)
-    case "$os_name" in
-        '"Ubuntu"' )
-            printf "ubuntu"
+    case "$(uname -s)" in
+        Darwin)
+            printf 'macos\n'
             ;;
-        '"CentOS Linux"' )
-            printf "centos"
+        Linux)
+            if [[ -r /etc/os-release ]]; then
+                # shellcheck disable=SC1091
+                . /etc/os-release
+                case "${ID:-}" in
+                    ubuntu)
+                        printf 'ubuntu\n'
+                        ;;
+                    *)
+                        printf 'unknown\n'
+                        ;;
+                esac
+            else
+                printf 'unknown\n'
+            fi
             ;;
-        "*" )
-            printf "unknown"
+        *)
+            printf 'unknown\n'
             ;;
     esac
 }
 
 install_mac() {
-    if [ ! $(which brew) ]; then
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    if ! command -v brew >/dev/null 2>&1; then
+        echo "Homebrew is required. Install it from https://brew.sh/ and rerun this script." >&2
+        return 1
     fi
-
-    brew install $@
+    brew install "$@"
 }
 
 install_ubuntu() {
-    sudo apt-get install --no-upgrade --assume-yes $@
-}
-
-install_python() {
-    python3 -m pip install --user $@
+    if ! command -v apt-get >/dev/null 2>&1; then
+        echo "apt-get is required for Ubuntu setup." >&2
+        return 1
+    fi
+    sudo apt-get install --no-upgrade --assume-yes "$@"
 }
 
 setup_zsh() {
-    if [ ! -d "$HOME/.oh-my-zsh/" ]; then
+    if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     fi
 
-    # ~/.zsh_profile
-    # ~/.zshrc
-    # ~/.aliases
-    linkme zsh_profile
+    linkme zsh_profile '' zprofile
     linkme zshrc
     linkme aliases
 
-    echo ""
-    echo "Run the follow to activate the new settings"
-    echo " source ${HOME}/.zshrc"
+    echo "Zsh configuration installed. Start a new shell to activate it."
 }
 
 setup_bash() {
-    case $(detect_os) in
-        'macos' )
+    case "$(detect_os)" in
+        macos)
             install_mac bash-completion bash-git-prompt
             ;;
-        'ubuntu' )
+        ubuntu)
             install_ubuntu bash-completion git
-            git clone https://github.com/magicmonty/bash-git-prompt.git $XDG_CONFIG_HOME/bash-git-prompt --depth 1
+            if [[ ! -d "$XDG_CONFIG_HOME/bash-git-prompt" ]]; then
+                git clone --depth 1 \
+                    https://github.com/magicmonty/bash-git-prompt.git \
+                    "$XDG_CONFIG_HOME/bash-git-prompt"
+            fi
+            ;;
+        *)
+            echo "Unsupported operating system for Bash setup." >&2
+            return 1
             ;;
     esac
 
-    # ~/.bash_profile
-    # ~/.bashrc
-    # ~/.aliases
     linkme bash_profile
     linkme bashrc
     linkme aliases
 
-    # remove old aliaes if found
-    rm -rf "$XDG_CONFIG_HOME/bash/aliases"
-
-    source $HOME/.bashrc
-}
-
-setup_tmux() {
-    # ~/.tmux.conf
-    linkme tmux.conf
-}
-
-setup_i3() {
-    # ~/.config/i3/config
-    # ~/.config/i3status/config
-    linkme i3.config i3 config
-    linkme i3status.config i3status config
+    echo "Bash configuration installed. Start a new shell to activate it."
 }
 
 setup_git() {
-    # ~/.config/git/{config,ignore}
     linkme gitconfig git config
     linkme gitignore git ignore
 }
 
 setup_vim() {
-    # install python pacakges for vim plugins
-    install_python pynvim
-
-    # ~/.vimrc
     linkme vimrc
 }
 
-setup_nvim() {
-    # install python packages for nvim plugins
-    install_python pynvim
-
-    # ~/.config/nvim/init.vim
-    linkme vimrc nvim init.vim
+setup_nvim_dependencies() {
+    case "$(detect_os)" in
+        macos)
+            install_mac ctags git curl fd neovim ripgrep
+            ;;
+        ubuntu)
+            install_ubuntu ctags git curl fd-find neovim ripgrep
+            ;;
+        *)
+            echo "Unsupported operating system for Neovim setup: $(detect_os)" >&2
+            return 1
+            ;;
+    esac
 }
 
+setup_nvim() {
+    setup_nvim_dependencies
+    linkme nvim/init.lua nvim init.lua
+}
 
 setup_macos() {
-    pkg=(
-    ag
-    byobu
-    cmake
-    ctags
-    gnu-sed
-    htop
-    jq
-    tree
-    wget
+    local packages=(
+        gh
+        gnu-sed
+        htop
+        jq
+        nmap
+        tree
+        wget
     )
-
-    install_mac ${pkg[@]}
+    install_mac "${packages[@]}"
 }
 
 setup_ubuntu() {
-    pkg=(
-    byobu
-    cmake
-    ctags
-    curl
-    htop
-    jq
-    silversearcher-ag
-    wget
+    local packages=(
+        gh
+        htop
+        jq
+        nmap
+        tree
+        wget
     )
-
-    install_ubuntu ${pkg[@]}
+    install_ubuntu "${packages[@]}"
 }
 
-setup_python() {
-    case $(detect_os) in
-        'macos' )
-            install_mac pyenv
-            ;;
-        'ubuntu' )
-            install_ubuntu python3-pip
+install_asdf_ubuntu() {
+    if command -v asdf >/dev/null 2>&1; then
+        return
+    fi
+
+    command -v curl >/dev/null 2>&1 || {
+        echo "curl is required to install asdf." >&2
+        return 1
+    }
+
+    local asdf_version="${ASDF_VERSION:-v0.20.0}"
+    local asdf_arch archive tmpdir
+    case "$(uname -m)" in
+        x86_64|amd64) asdf_arch="amd64" ;;
+        aarch64|arm64) asdf_arch="arm64" ;;
+        *)
+            echo "Unsupported Linux architecture for asdf: $(uname -m)" >&2
+            return 1
             ;;
     esac
 
-    # install basic python packages
-    install_python black flake8 pipenv
+    tmpdir="$(mktemp -d)"
+    archive="$tmpdir/asdf.tar.gz"
 
-    # flake8
-    linkme flake8 $NODIR
+    curl -fsSL \
+        "https://github.com/asdf-vm/asdf/releases/download/${asdf_version}/asdf-${asdf_version}-linux-${asdf_arch}.tar.gz" \
+        -o "$archive"
+    tar -xzf "$archive" -C "$tmpdir"
+    mkdir -p "$HOME/.local/bin"
+    install -m 0755 "$tmpdir/asdf" "$HOME/.local/bin/asdf"
+    rm -rf "$tmpdir"
+    export PATH="$HOME/.local/bin:$PATH"
+}
 
-    # pep8
-    linkme pep8 $NODIR
+setup_sdk() {
+    case "$(detect_os)" in
+        macos)
+            install_mac asdf uv
+            ;;
+        ubuntu)
+            install_ubuntu curl
+            install_asdf_ubuntu
+            if ! command -v uv >/dev/null 2>&1; then
+                curl -LsSf https://astral.sh/uv/install.sh | sh
+                export PATH="$HOME/.local/bin:$PATH"
+            fi
+            ;;
+        *)
+            echo "Unsupported operating system for uv setup." >&2
+            return 1
+            ;;
+    esac
 
-    # pip
-    linkme pip.conf pip
+    if ! command -v uv >/dev/null 2>&1; then
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+    command -v uv >/dev/null 2>&1 || {
+        echo "uv was installed but is not available in PATH." >&2
+        return 1
+    }
+
+    uv tool install --upgrade ruff
+    linkme ruff.toml ruff ruff.toml
 }
 
 setup_os() {
-    setup_git
-    setup_python
-
-    case $(detect_os) in
-        'macos' )
+    case "$(detect_os)" in
+        macos)
             setup_macos
-            setup_vim
-            setup_zsh
             ;;
-        'ubuntu' )
+        ubuntu)
             setup_ubuntu
-            setup_vim
-            setup_bash
+            ;;
+        *)
+            echo "Unsupported operating system: $(detect_os)" >&2
+            return 1
             ;;
     esac
 }
 
-uninstall_pip() {
-    pip3 freeze | grep '==' | cut -d '=' -f1 | tr '\n' ' ' | xargs sudo pip3 uninstall -y
-}
+setup_init() {
+    local os
+    os="$(detect_os)"
 
-maincmd=$(basename $0)
+    setup_os
+    setup_git
+    setup_sdk
+    setup_nvim
+
+    case "$os" in
+        macos)
+            setup_zsh
+            ;;
+        ubuntu)
+            setup_bash
+            ;;
+        *)
+            echo "Unsupported operating system: $os" >&2
+            return 1
+            ;;
+    esac
+}
 
 usage() {
-    echo "Usage: $maincmd <subcommand> [options]\n"
-    echo "Subcommands:"
-    echo "  os [macos|ubuntu]: set up system based on OS. (Mac or Ubuntu)"
-    echo "  [z|ba]sh: set up zsh (Mac) or bash (Ubuntu)"
-    echo "  git: install and setup git"
-    echo "  python: install python packages"
-    echo "  [nvim|vim]: install and setup (neo)vim"
-    echo "  i3: setup i3"
-    echo "  tmux: setup tmux"
+    cat <<EOF
+Usage: $(basename "$0") <subcommand>
+
+Subcommands:
+  init     Install system utilities and configure the detected system
+  os       Install system utilities only
+  zsh      Configure Zsh and Oh My Zsh
+  bash     Configure Bash and bash-git-prompt
+  git-config  Configure Git
+  sdk      Install asdf/uv, Ruff, and the SDK configuration
+  nvim     Install Neovim and dependencies, then configure it
+  vim-config  Configure Vim
+EOF
 }
 
+if (($# == 0)); then
+    usage
+    exit 0
+fi
 
-subcmd=$1
-case $subcmd in
-    '' | '-h' | '--help' )
-        usage
-        ;;
-    'clean-pip' )
-        uninstall_pip
-        ;;
-    * )
-        shift
-        setup_${subcmd} $@
-        if [ $? = 127 ]; then
-            echo "Error: '$subcmd' is not valid subcommand." >&2
-            echo "       Run $maincmd --help"
-        fi
+subcmd="$1"
+shift
+
+if (($# != 0)); then
+    echo "Error: '$subcmd' does not accept additional arguments." >&2
+    exit 2
+fi
+
+case "$subcmd" in
+    init) setup_init ;;
+    os) setup_os ;;
+    zsh) setup_zsh ;;
+    bash) setup_bash ;;
+    git-config) setup_git ;;
+    sdk) setup_sdk ;;
+    nvim) setup_nvim ;;
+    vim-config) setup_vim ;;
+    -h|--help) usage ;;
+    *)
+        echo "Error: '$subcmd' is not a valid subcommand." >&2
+        usage >&2
+        exit 2
         ;;
 esac

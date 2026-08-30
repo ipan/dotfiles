@@ -14,7 +14,6 @@ fi
 
 if [ "$(uname)" = "Darwin" ]; then
   alias flushdns='dscacheutil -flushcache;sudo killall -HUP mDNSResponder && echo DNS flushed'
-  alias byobu='BYOBU_PYTHON=`which python3` byobu'
 fi
 
 # docker related
@@ -51,6 +50,14 @@ alias gitpersonal='git config user.email [redacted-email]'
 # python
 alias python="python3"
 
-# vi/vim/nvim
-[ -f "$(which vim)" ] && alias vi=$(which vim)
-[ -f "$(which nvim)" ] && alias vim=$(which nvim)
+# Use Neovim as the default editor when available.
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR=nvim
+  export VISUAL=nvim
+  alias vi='nvim'
+  alias vim='nvim'
+elif command -v vim >/dev/null 2>&1; then
+  export EDITOR=vim
+  export VISUAL=vim
+  alias vi='vim'
+fi

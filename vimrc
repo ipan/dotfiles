@@ -1,7 +1,9 @@
 " vim settings
 "
-" <leader> -> \
+" <leader> -> Space
 " <C> -> Control
+let mapleader = " "
+let maplocalleader = " "
 " j: down
 " k: up
 " h: left
@@ -26,6 +28,14 @@ set title
 
 " make sure number in gutter is not copied
 set mouse=a
+set number
+set relativenumber
+set ignorecase
+set smartcase
+set signcolumn=yes
+if exists('&inccommand')
+  set inccommand=split
+endif
 
 " Split: behavior and shortcut
 " reszie +5 / vertical resize -
@@ -61,8 +71,7 @@ vnoremap <leader>P "+P
 nnoremap <silent> <F5> :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
 
 if has("nvim")
-    " == neovim only ==
-    " NeoVim Term: map <Esc> to exit terminal-mode
+    " NeoVim terminal: map <Esc> to exit terminal-mode
     tnoremap <Esc> <C-\><C-n>
 else
     " == vim only ==
@@ -72,19 +81,10 @@ else
     au VimLeave * :!clear
 endif
 
-" live substitute: neovim only
-if exists('&inccommand')
-  set inccommand=split
-endif
-
 " == vim plugins ==
 
 " Plug: install vim-plug if not found
-if has('nvim')
-    let g:vim_plug_install_path = '~/.config/nvim/autoload/plug.vim'
-else
-    let g:vim_plug_install_path = '~/.vim/autoload/plug.vim'
-endif
+let g:vim_plug_install_path = '~/.vim/autoload/plug.vim'
 
 if empty(glob(vim_plug_install_path))
   let g:vim_plug_github = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
@@ -92,11 +92,7 @@ if empty(glob(vim_plug_install_path))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-if has('nvim')
-    let g:vim_plug_dir = '~/.local/share/nvim/plugged'
-else
-    let g:vim_plug_dir = '~/.vim/plugged'
-endif
+let g:vim_plug_dir = '~/.vim/plugged'
 
 " Plug: vim plugins, use single quote
 call plug#begin(vim_plug_dir)
@@ -105,24 +101,18 @@ call plug#begin(vim_plug_dir)
 Plug 'tpope/vim-sensible'
 
 " colorscheme
-Plug 'sheerun/vim-polyglot'
-Plug 'robertmeta/nofrils'
-Plug 'arzg/vim-corvine'
-Plug 'dracula/vim'
+Plug 'ghifarit53/tokyonight-vim'
 
-" status
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+" status (the Vim-compatible equivalent of lualine)
+Plug 'itchyny/lightline.vim'
 
 " git
 Plug 'tpope/vim-fugitive'
 
 " gutter
 Plug 'airblade/vim-gitgutter'
-Plug 'myusuf3/numbers.vim'
 
 " code search and navigation
-Plug 'haya14busa/incsearch.vim'
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'majutsushi/tagbar'
 
@@ -131,49 +121,19 @@ Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
 
-" python
-if executable("black") && has("python3")
-    Plug 'psf/black'
-endif
-if has("nvim") && has("python3")
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-  Plug 'deoplete-plugins/deoplete-jedi'
-  Plug 'deoplete-plugins/deoplete-clang'
-  Plug 'deoplete-plugins/deoplete-go'
-  Plug 'deoplete-plugins/deoplete-make'
-  Plug 'deoplete-plugins/deoplete-terminal'
-  Plug 'deoplete-plugins/deoplete-zsh'
-  Plug 'deoplete-plugins/deoplete-docker'
-  Plug 'deoplete-plugins/deoplete-tag'
-  
-endif
 call plug#end()
 
-" colorschemes
-silent! colorscheme dracula
+" colorscheme
+silent! colorscheme tokyonight
 
-" python 3 only
-let g:python3_host_prog='python3'
-let g:loaded_python_provider = 0
-let g:python_host_prog = ''
-
-" airline-themes
-let g:airline_theme='minimalist'
+" lightline
+let g:lightline = { 'colorscheme': 'tokyonight' }
 
 " TagBar:
 nmap <Leader>rt :TagbarToggle<CR>
 
 " NERDTree:
 map <C-n> :NERDTreeToggle<CR>
-
-
-
-" Deoplete
-" Enable deoplete when InsertEnter.
-if has("python3")
-  let g:deoplete#enable_at_startup = 0
-  autocmd InsertEnter * call deoplete#enable()
-endif
 
 " Vimux
 " Prompt for a command to run

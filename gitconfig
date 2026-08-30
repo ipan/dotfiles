@@ -2,7 +2,7 @@
     name = Ivan Pan
 
 [core]
-    editor = $EDITOR
+    editor = nvim
     quotepath = false
 
 [log]
