@@ -176,8 +176,6 @@ setup_zed() {
             ;;
     esac
 
-    # Link the shared Zed user settings.
-    linkme zed/settings.json zed settings.json
 }
 
 setup_macos() {

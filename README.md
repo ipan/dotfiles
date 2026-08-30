@@ -21,7 +21,7 @@ Individual components can also be installed:
 ```bash
 ./install.sh git-config
 ./install.sh nvim  # installs Neovim and its dependencies
-./install.sh zed   # installs Zed and links its settings
+./install.sh zed   # installs Zed
 ./install.sh vim-config
 ./install.sh zsh
 ./install.sh bash
@@ -81,8 +81,7 @@ official installers. It skips a tool that is already available on `PATH`.
 ## Zed
 
 `./install.sh zed` installs Zed through Homebrew on macOS and Zed's official
-installer on Ubuntu. It links [`zed/settings.json`](zed/settings.json) to
-`$XDG_CONFIG_HOME/zed/settings.json` (normally `~/.config/zed/settings.json`).
+installer on Ubuntu. Existing Zed settings are left unchanged.
 
 ## Neovim
 
