@@ -132,6 +132,14 @@ setup_bash() {
 }
 
 setup_git() {
+    # Git ignores the XDG config while ~/.gitconfig exists. Preserve the old
+    # file so the linked config under ~/.config/git/config becomes active.
+    if [[ -e "$HOME/.gitconfig" || -L "$HOME/.gitconfig" ]]; then
+        mkdir -p "$BACKUP_DIR"
+        mv "$HOME/.gitconfig" "$BACKUP_DIR/.gitconfig.$BACKUP_TIMESTAMP.bak"
+        echo "Backed up $HOME/.gitconfig"
+    fi
+
     linkme gitconfig git config
     linkme gitconfig-thermofisher
     linkme gitignore git ignore
@@ -162,7 +170,14 @@ setup_nvim() {
 }
 
 setup_zed() {
-    # Install Zed using its supported package source.
+    # Install Zed using its supported package source, unless it is already
+    # installed outside of the package manager.
+    if [[ -d "/Applications/Zed.app" || -d "$HOME/Applications/Zed.app" ]] ||
+        command -v zed >/dev/null 2>&1; then
+        echo "Zed is already installed; skipping."
+        return
+    fi
+
     case "$(detect_os)" in
         macos)
             install_mac --cask zed
@@ -176,7 +191,6 @@ setup_zed() {
             return 1
             ;;
     esac
-
 }
 
 setup_macos() {
@@ -362,12 +376,16 @@ setup_ai_tools() {
     }
 
     # Install Pi, the terminal coding harness.
-    if ! command -v pi >/dev/null 2>&1; then
+    if command -v pi >/dev/null 2>&1; then
+        echo "pi is already installed; skipping."
+    else
         curl -fsSL https://pi.dev/install.sh | sh
     fi
 
     # Install omp (Oh My Pi), a terminal coding agent.
-    if ! command -v omp >/dev/null 2>&1; then
+    if command -v omp >/dev/null 2>&1; then
+        echo "omp is already installed; skipping."
+    else
         curl -fsSL https://omp.sh/install | sh
     fi
 
