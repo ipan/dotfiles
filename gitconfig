@@ -1,9 +1,34 @@
 [user]
     name = Ivan Pan
+    email = me@ivanpan.com
+
+[includeIf "hasconfig:remote.*.url:git@github.com:thermofisher/**"]
+    path = ~/.gitconfig-thermofisher
+
+[includeIf "hasconfig:remote.*.url:ssh://git@github.com/thermofisher/**"]
+    path = ~/.gitconfig-thermofisher
+
+[includeIf "hasconfig:remote.*.url:https://github.com/thermofisher/**"]
+    path = ~/.gitconfig-thermofisher
 
 [core]
     editor = nvim
     quotepath = false
+
+[init]
+    defaultBranch = main
+
+[fetch]
+    prune = true
+
+[diff]
+    algorithm = histogram
+
+[merge]
+    conflictStyle = zdiff3
+
+[rerere]
+    enabled = true
 
 [log]
     date = local
@@ -28,6 +53,19 @@
 
 [push]
     default = simple
+    autosetupremote = true
 
 [pull]
     rebase = false
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge --skip -- %f
+    required = true
+    process = git-lfs filter-process --skip
+
+[url "git@github-thermofisher:thermofisher/"]
+    insteadOf = git@github.com:thermofisher/
+
+[url "ssh://git@github-thermofisher/thermofisher/"]
+    insteadOf = ssh://git@github.com/thermofisher/

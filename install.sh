@@ -133,6 +133,7 @@ setup_bash() {
 
 setup_git() {
     linkme gitconfig git config
+    linkme gitconfig-thermofisher
     linkme gitignore git ignore
 }
 
