@@ -1,5 +1,12 @@
 # ~/.zprofile — macOS login-shell settings
 
+# Prefer Homebrew tools, including Homebrew Git, over macOS system tools.
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 # XDG Base Directory defaults
 if [[ -z "${XDG_CONFIG_HOME:-}" ]]; then
     export XDG_CONFIG_HOME="$HOME/.config"
