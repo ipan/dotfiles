@@ -15,10 +15,6 @@ export GOBIN="${GOBIN:-$GOPATH/bin}"
 if [ -d "$HOME/.local/bin" ]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
-# Add the Go toolchain installed by the SDK setup.
-if [ -d "$HOME/.local/go/bin" ]; then
-    export PATH="$HOME/.local/go/bin:$PATH"
-fi
 
 # Add Go-installed binaries.
 if [ -d "$GOBIN" ]; then

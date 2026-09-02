@@ -27,6 +27,7 @@ Individual components can also be installed:
 ./install.sh bash
 ./install.sh sdk
 ./install.sh ai-tools  # installs Pi, omp, and CodeGraph
+./install.sh agent-instructions  # link CodeGraph instructions for Codex, Pi, and omp
 ```
 
 Installer backups are stored in the ignored `tmp/backups/` directory with a
@@ -37,7 +38,7 @@ The `init` command:
 - Configures Git, shell files, and editor settings with symlinks.
 - Installs Neovim and Zed on macOS and Ubuntu.
 - Installs asdf and `uv`; asdf manages Node.js, Java, Maven, and Ant, while uv manages Python environments and tools across code repositories.
-- Installs Go using its official distribution and rustup using the official installer. Go manages its own toolchain and installed binaries; rustup manages Rust toolchains, `rustc`, `cargo`, and Rust components. Go and Rust are not installed through Homebrew or asdf.
+- Installs Go through Homebrew on macOS and the official distribution on Ubuntu; installs rustup using the official installer. Go manages its own toolchain and installed binaries; rustup manages Rust toolchains, `rustc`, `cargo`, and Rust components.
 - Installs `fd`/`fd-find` and `ripgrep` for Neovim search.
 - Uses Zsh on macOS and Bash on Linux.
 - The `os` command installs system utilities without changing configuration files. The `sdk` command installs the language/tool managers, Go, and rustup's default stable toolchain.
@@ -45,7 +46,8 @@ The `init` command:
 
 ## Toolchain management
 
-Each ecosystem owns its toolchain; do not install Go or Rust from Homebrew.
+Each ecosystem owns its toolchain. Homebrew manages Go on macOS; the official
+Go distribution is used on Ubuntu; rustup manages Rust.
 
 - **asdf** manages selectable versions of Node.js, Java, Maven, and Ant. Set a
   machine default in `~/.tool-versions` with `asdf set -u <plugin> <version>`;
@@ -56,8 +58,9 @@ Each ecosystem owns its toolchain; do not install Go or Rust from Homebrew.
   resolution, and isolated CLI tools across repositories. Use `uv sync` (or
   `uv run`) in a Python project and `uv tool install <tool>` for a globally
   available Python CLI such as Ruff.
-- **Go** manages its own compiler toolchain and project dependencies. The SDK
-  installer downloads the current official release; `go.mod` declares the
+- **Go** manages its own compiler toolchain and project dependencies. On macOS,
+  Homebrew manages the Go installation and updates; on Ubuntu, the SDK
+  installer downloads the current official release. `go.mod` declares the
   language version for a project, and `go install` places user binaries in
   `GOBIN` (default: `~/go/bin`).
 - **rustup** installs and selects Rust toolchains, which provide `rustc`,
@@ -66,8 +69,9 @@ Each ecosystem owns its toolchain; do not install Go or Rust from Homebrew.
   `rust-toolchain.toml`.
 
 The `sdk` installer installs asdf and uv; configures the Node.js, Java, Maven,
-and Ant asdf plugins; installs the latest Go release (or `GO_VERSION` when set)
-and rustup's default stable toolchain; then installs Ruff with uv.
+and Ant asdf plugins; installs Go through Homebrew on macOS or the official
+distribution on Ubuntu; installs rustup's default stable toolchain; then
+installs Ruff with uv.
 
 ## AI tools
 
@@ -77,6 +81,20 @@ official installers. It skips a tool that is already available on `PATH`.
 - [Pi](https://pi.dev/) — terminal coding harness.
 - [omp](https://omp.sh/) (Oh My Pi) — terminal coding agent.
 - [CodeGraph](https://github.com/colbymchenry/codegraph) — code-intelligence CLI.
+
+### Shared agent instructions
+
+`./install.sh agent-instructions` symlinks the repository's
+[`AGENTS.md`](AGENTS.md) to these global instruction paths:
+
+- `~/.codex/AGENTS.md`
+- `~/.pi/agent/AGENTS.md`
+- `~/.omp/agent/AGENTS.md`
+
+Existing regular files are backed up to `tmp/backups/`; existing symlinks are
+replaced. The shared instructions direct agents to initialize and synchronize a
+repository's CodeGraph index before exploratory work. They do not install
+CodeGraph or configure an MCP server.
 
 ## Zed
 

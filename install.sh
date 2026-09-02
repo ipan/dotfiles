@@ -262,6 +262,19 @@ ensure_asdf_plugin() {
 }
 
 install_go() {
+    case "$(detect_os)" in
+        macos)
+            install_mac go
+            return
+            ;;
+        ubuntu)
+            ;;
+        *)
+            echo "Unsupported operating system for Go: $(detect_os)" >&2
+            return 1
+            ;;
+    esac
+
     if command -v go >/dev/null 2>&1; then
         return
     fi
@@ -271,15 +284,7 @@ install_go() {
         return 1
     }
 
-    local go_os go_arch go_version archive tmpdir
-    case "$(uname -s)" in
-        Darwin) go_os="darwin" ;;
-        Linux) go_os="linux" ;;
-        *)
-            echo "Unsupported operating system for Go: $(uname -s)" >&2
-            return 1
-            ;;
-    esac
+    local go_arch go_version archive tmpdir
     case "$(uname -m)" in
         x86_64|amd64) go_arch="amd64" ;;
         aarch64|arm64) go_arch="arm64" ;;
@@ -303,7 +308,7 @@ install_go() {
     tmpdir="$(mktemp -d)"
     archive="$tmpdir/go.tar.gz"
     curl -fsSL \
-        "https://go.dev/dl/go${go_version}.${go_os}-${go_arch}.tar.gz" \
+        "https://go.dev/dl/go${go_version}.linux-${go_arch}.tar.gz" \
         -o "$archive"
     mkdir -p "$HOME/.local"
     tar -xzf "$archive" -C "$HOME/.local"
@@ -351,7 +356,7 @@ setup_sdk() {
     ensure_asdf_plugin maven https://github.com/halcyon/asdf-maven.git
     ensure_asdf_plugin nodejs https://github.com/asdf-vm/asdf-nodejs.git
 
-    # Install Go and rustup outside of asdf.
+    # Install Go through Homebrew on macOS and the official distribution on Ubuntu; rustup uses its official installer.
     install_go
     install_rustup
 
@@ -393,6 +398,39 @@ setup_ai_tools() {
     if ! command -v codegraph >/dev/null 2>&1; then
         curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh
     fi
+}
+
+setup_agent_instructions() {
+    local source="$SCRIPT_DIR/AGENTS.md"
+    local dst backup backup_name agent_name
+    local destinations=(
+        "$HOME/.codex/AGENTS.md"
+        "$HOME/.pi/agent/AGENTS.md"
+        "$HOME/.omp/agent/AGENTS.md"
+    )
+
+    if [[ ! -f "$source" ]]; then
+        echo "Error: agent instructions not found: $source" >&2
+        return 1
+    fi
+
+    for dst in "${destinations[@]}"; do
+        mkdir -p "$(dirname "$dst")"
+
+        if [[ -L "$dst" ]]; then
+            rm -f "$dst"
+        elif [[ -e "$dst" ]]; then
+            mkdir -p "$BACKUP_DIR"
+            agent_name="${dst#"$HOME"/.}"
+            backup_name="${agent_name//\//-}.${BACKUP_TIMESTAMP}.bak"
+            backup="$BACKUP_DIR/$backup_name"
+            mv "$dst" "$backup"
+            echo "Backed up $dst to $backup"
+        fi
+
+        ln -s "$source" "$dst"
+        echo "Linked $dst -> $source"
+    done
 }
 
 setup_os() {
@@ -446,6 +484,7 @@ Subcommands:
   git-config  Configure Git
   sdk      Install asdf plugins, Go, rustup, uv, Ruff, and SDK configuration
   ai-tools Install Pi, omp, and CodeGraph
+  agent-instructions  Link shared CodeGraph instructions for Codex, Pi, and omp
   nvim     Install Neovim and dependencies, then configure it
   zed      Install Zed and configure its settings
   vim-config  Configure Vim
@@ -473,6 +512,7 @@ case "$subcmd" in
     git-config) setup_git ;;
     sdk) setup_sdk ;;
     ai-tools) setup_ai_tools ;;
+    agent-instructions) setup_agent_instructions ;;
     nvim) setup_nvim ;;
     zed) setup_zed ;;
     vim-config) setup_vim ;;
