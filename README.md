@@ -26,8 +26,8 @@ Individual components can also be installed:
 ./install.sh zsh
 ./install.sh bash
 ./install.sh sdk
-./install.sh ai-tools  # installs Pi, omp, and CodeGraph
-./install.sh agent-instructions  # link CodeGraph instructions for Codex, Pi, and omp
+./install.sh ai-tools  # installs omp and CodeGraph
+./install.sh agent-instructions  # link CodeGraph instructions for Codex and omp
 ```
 
 Installer backups are stored in the ignored `tmp/backups/` directory with a
@@ -78,7 +78,6 @@ installs Ruff with uv.
 `./install.sh ai-tools` installs the following optional terminal tools via their
 official installers. It skips a tool that is already available on `PATH`.
 
-- [Pi](https://pi.dev/) — terminal coding harness.
 - [omp](https://omp.sh/) (Oh My Pi) — terminal coding agent.
 - [CodeGraph](https://github.com/colbymchenry/codegraph) — code-intelligence CLI.
 
@@ -88,7 +87,6 @@ official installers. It skips a tool that is already available on `PATH`.
 [`AGENTS.md`](AGENTS.md) to these global instruction paths:
 
 - `~/.codex/AGENTS.md`
-- `~/.pi/agent/AGENTS.md`
 - `~/.omp/agent/AGENTS.md`
 
 Existing regular files are backed up to `tmp/backups/`; existing symlinks are

@@ -380,12 +380,6 @@ setup_ai_tools() {
         return 1
     }
 
-    # Install Pi, the terminal coding harness.
-    if command -v pi >/dev/null 2>&1; then
-        echo "pi is already installed; skipping."
-    else
-        curl -fsSL https://pi.dev/install.sh | sh
-    fi
 
     # Install omp (Oh My Pi), a terminal coding agent.
     if command -v omp >/dev/null 2>&1; then
@@ -405,7 +399,6 @@ setup_agent_instructions() {
     local dst backup backup_name agent_name
     local destinations=(
         "$HOME/.codex/AGENTS.md"
-        "$HOME/.pi/agent/AGENTS.md"
         "$HOME/.omp/agent/AGENTS.md"
     )
 
@@ -483,8 +476,8 @@ Subcommands:
   bash     Configure Bash and bash-git-prompt
   git-config  Configure Git
   sdk      Install asdf plugins, Go, rustup, uv, Ruff, and SDK configuration
-  ai-tools Install Pi, omp, and CodeGraph
-  agent-instructions  Link shared CodeGraph instructions for Codex, Pi, and omp
+  ai-tools Install omp and CodeGraph
+  agent-instructions  Link shared CodeGraph instructions for Codex and omp
   nvim     Install Neovim and dependencies, then configure it
   zed      Install Zed and configure its settings
   vim-config  Configure Vim
