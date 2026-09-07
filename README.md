@@ -37,17 +37,19 @@ The `init` command:
 
 - Configures Git, shell files, and editor settings with symlinks.
 - Installs Neovim and Zed on macOS and Ubuntu.
-- Installs asdf and `uv`; asdf manages Node.js, Java, Maven, and Ant, while uv manages Python environments and tools across code repositories.
-- Installs Go through Homebrew on macOS and the official distribution on Ubuntu; installs rustup using the official installer. Go manages its own toolchain and installed binaries; rustup manages Rust toolchains, `rustc`, `cargo`, and Rust components.
+- Installs asdf from its official release and `uv` from Astral's official installer; asdf manages Node.js, Java, Maven, and Ant, while uv manages Python environments and tools across code repositories.
+- Installs Go through the official installer on macOS and Ubuntu; installs rustup using the official installer. Go manages its own toolchain and installed binaries; rustup manages Rust toolchains, `rustc`, `cargo`, and Rust components.
+- Installs GitHub CLI from its official release during SDK setup and does not install `wget`.
 - Installs `fd`/`fd-find` and `ripgrep` for Neovim search.
 - Uses Zsh on macOS and Bash on Linux.
+- Detects Intel Macs and skips Homebrew-backed package and OS installation because Homebrew no longer supports them; the SDK uses official installers instead.
 - The `os` command installs system utilities without changing configuration files. The `sdk` command installs the language/tool managers, Go, and rustup's default stable toolchain.
 - Does not install or configure tmux, i3, Byobu, Flake8, pycodestyle, or Deoplete.
 
 ## Toolchain management
 
-Each ecosystem owns its toolchain. Homebrew manages Go on macOS; the official
-Go distribution is used on Ubuntu; rustup manages Rust.
+Each ecosystem owns its toolchain. The official Go distribution is used on
+macOS and Ubuntu; rustup manages Rust.
 
 - **asdf** manages selectable versions of Node.js, Java, Maven, and Ant. Set a
   machine default in `~/.tool-versions` with `asdf set -u <plugin> <version>`;
@@ -58,9 +60,8 @@ Go distribution is used on Ubuntu; rustup manages Rust.
   resolution, and isolated CLI tools across repositories. Use `uv sync` (or
   `uv run`) in a Python project and `uv tool install <tool>` for a globally
   available Python CLI such as Ruff.
-- **Go** manages its own compiler toolchain and project dependencies. On macOS,
-  Homebrew manages the Go installation and updates; on Ubuntu, the SDK
-  installer downloads the current official release. `go.mod` declares the
+- **Go** manages its own compiler toolchain and project dependencies. The SDK
+  installer downloads the current official release on macOS and Ubuntu. `go.mod` declares the
   language version for a project, and `go install` places user binaries in
   `GOBIN` (default: `~/go/bin`).
 - **rustup** installs and selects Rust toolchains, which provide `rustc`,
@@ -69,8 +70,8 @@ Go distribution is used on Ubuntu; rustup manages Rust.
   `rust-toolchain.toml`.
 
 The `sdk` installer installs asdf and uv; configures the Node.js, Java, Maven,
-and Ant asdf plugins; installs Go through Homebrew on macOS or the official
-distribution on Ubuntu; installs rustup's default stable toolchain; then
+and Ant asdf plugins; installs Go through the official installer; installs
+rustup's default stable toolchain; then
 installs Ruff with uv.
 
 ## AI tools
@@ -96,15 +97,15 @@ CodeGraph or configure an MCP server.
 
 ## Zed
 
-`./install.sh zed` installs Zed through Homebrew on macOS and Zed's official
-installer on Ubuntu. Existing Zed settings are left unchanged.
+`./install.sh zed` installs Zed through its official installer on macOS and
+Ubuntu. Existing Zed settings are left unchanged.
 
 ## Neovim
 
 Neovim is configured in [`nvim/init.lua`](nvim/init.lua) and uses `lazy.nvim`.
 The first launch bootstraps `lazy.nvim` and installs the configured plugins.
 `./install.sh nvim` also installs Neovim's system dependencies, including Git,
-curl, fd, ripgrep, and ctags.
+curl, fd, and ripgrep.
 
 Selected plugins include:
 

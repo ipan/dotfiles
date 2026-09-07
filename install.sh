@@ -53,7 +53,11 @@ linkme() {
 detect_os() {
     case "$(uname -s)" in
         Darwin)
-            printf 'macos\n'
+            if [[ "$(uname -m)" == "x86_64" ]]; then
+                printf 'macos-intel\n'
+            else
+                printf 'macos\n'
+            fi
             ;;
         Linux)
             if [[ -r /etc/os-release ]]; then
@@ -78,6 +82,11 @@ detect_os() {
 }
 
 install_mac() {
+    if [[ "$(detect_os)" == "macos-intel" ]]; then
+        echo "Intel Mac detected; skipping Homebrew packages."
+        return 0
+    fi
+
     if ! command -v brew >/dev/null 2>&1; then
         echo "Homebrew is required. Install it from https://brew.sh/ and rerun this script." >&2
         return 1
@@ -107,7 +116,7 @@ setup_zsh() {
 
 setup_bash() {
     case "$(detect_os)" in
-        macos)
+        macos|macos-intel)
             install_mac bash-completion bash-git-prompt
             ;;
         ubuntu)
@@ -151,11 +160,11 @@ setup_vim() {
 
 setup_nvim_dependencies() {
     case "$(detect_os)" in
-        macos)
-            install_mac ctags git curl fd neovim ripgrep
+        macos|macos-intel)
+            install_mac git curl fd neovim ripgrep
             ;;
         ubuntu)
-            install_ubuntu ctags git curl fd-find neovim ripgrep
+            install_ubuntu git curl fd-find neovim ripgrep
             ;;
         *)
             echo "Unsupported operating system for Neovim setup: $(detect_os)" >&2
@@ -179,8 +188,12 @@ setup_zed() {
     fi
 
     case "$(detect_os)" in
-        macos)
-            install_mac --cask zed
+        macos|macos-intel)
+            command -v curl >/dev/null 2>&1 || {
+                echo "curl is required to install Zed." >&2
+                return 1
+            }
+            curl -fsSL https://zed.dev/install.sh | sh
             ;;
         ubuntu)
             install_ubuntu curl
@@ -195,30 +208,87 @@ setup_zed() {
 
 setup_macos() {
     local packages=(
-        gh
         gnu-sed
         htop
         jq
         nmap
         tree
-        wget
     )
     install_mac "${packages[@]}"
 }
 
 setup_ubuntu() {
     local packages=(
-        gh
         htop
         jq
         nmap
         tree
-        wget
     )
+    install_ubuntu curl
     install_ubuntu "${packages[@]}"
 }
 
-install_asdf_ubuntu() {
+install_gh() {
+    if command -v gh >/dev/null 2>&1; then
+        return
+    fi
+
+    command -v curl >/dev/null 2>&1 || {
+        echo "curl is required to install GitHub CLI." >&2
+        return 1
+    }
+
+    local gh_arch gh_version archive tmpdir
+    gh_version="${GH_VERSION:-}"
+    if [[ -z "$gh_version" ]]; then
+        gh_version="$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest |
+            sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+    fi
+    gh_version="${gh_version#v}"
+    if [[ -z "$gh_version" ]]; then
+        echo "Could not determine the latest GitHub CLI version." >&2
+        return 1
+    fi
+
+    tmpdir="$(mktemp -d)"
+    case "$(detect_os)" in
+        macos|macos-intel)
+            archive="$tmpdir/gh.pkg"
+            curl -fsSL \
+                "https://github.com/cli/cli/releases/download/v${gh_version}/gh_${gh_version}_macOS_universal.pkg" \
+                -o "$archive"
+            sudo installer -pkg "$archive" -target /
+            ;;
+        ubuntu)
+            case "$(uname -m)" in
+                x86_64|amd64) gh_arch="amd64" ;;
+                aarch64|arm64) gh_arch="arm64" ;;
+                *)
+                    echo "Unsupported architecture for GitHub CLI: $(uname -m)" >&2
+                    rm -rf "$tmpdir"
+                    return 1
+                    ;;
+            esac
+            archive="$tmpdir/gh.tar.gz"
+            curl -fsSL \
+                "https://github.com/cli/cli/releases/download/v${gh_version}/gh_${gh_version}_linux_${gh_arch}.tar.gz" \
+                -o "$archive"
+            tar -xzf "$archive" -C "$tmpdir"
+            mkdir -p "$HOME/.local/bin"
+            install -m 0755 "$tmpdir/gh_${gh_version}_linux_${gh_arch}/bin/gh" \
+                "$HOME/.local/bin/gh"
+            export PATH="$HOME/.local/bin:$PATH"
+            ;;
+        *)
+            echo "Unsupported operating system for GitHub CLI: $(detect_os)" >&2
+            rm -rf "$tmpdir"
+            return 1
+            ;;
+    esac
+    rm -rf "$tmpdir"
+}
+
+install_asdf() {
     if command -v asdf >/dev/null 2>&1; then
         return
     fi
@@ -229,12 +299,21 @@ install_asdf_ubuntu() {
     }
 
     local asdf_version="${ASDF_VERSION:-v0.20.0}"
-    local asdf_arch archive tmpdir
+    local asdf_os asdf_arch archive tmpdir
+    case "$(detect_os)" in
+        macos|macos-intel) asdf_os="darwin" ;;
+        ubuntu) asdf_os="linux" ;;
+        *)
+            echo "Unsupported operating system for asdf: $(detect_os)" >&2
+            return 1
+            ;;
+    esac
+
     case "$(uname -m)" in
         x86_64|amd64) asdf_arch="amd64" ;;
         aarch64|arm64) asdf_arch="arm64" ;;
         *)
-            echo "Unsupported Linux architecture for asdf: $(uname -m)" >&2
+            echo "Unsupported architecture for asdf: $(uname -m)" >&2
             return 1
             ;;
     esac
@@ -243,12 +322,26 @@ install_asdf_ubuntu() {
     archive="$tmpdir/asdf.tar.gz"
 
     curl -fsSL \
-        "https://github.com/asdf-vm/asdf/releases/download/${asdf_version}/asdf-${asdf_version}-linux-${asdf_arch}.tar.gz" \
+        "https://github.com/asdf-vm/asdf/releases/download/${asdf_version}/asdf-${asdf_version}-${asdf_os}-${asdf_arch}.tar.gz" \
         -o "$archive"
     tar -xzf "$archive" -C "$tmpdir"
     mkdir -p "$HOME/.local/bin"
     install -m 0755 "$tmpdir/asdf" "$HOME/.local/bin/asdf"
     rm -rf "$tmpdir"
+    export PATH="$HOME/.local/bin:$PATH"
+}
+
+install_uv() {
+    if command -v uv >/dev/null 2>&1; then
+        return
+    fi
+
+    command -v curl >/dev/null 2>&1 || {
+        echo "curl is required to install uv." >&2
+        return 1
+    }
+
+    curl -LsSf https://astral.sh/uv/install.sh | sh
     export PATH="$HOME/.local/bin:$PATH"
 }
 
@@ -262,12 +355,13 @@ ensure_asdf_plugin() {
 }
 
 install_go() {
+    local go_os
     case "$(detect_os)" in
-        macos)
-            install_mac go
-            return
+        macos|macos-intel)
+            go_os="darwin"
             ;;
         ubuntu)
+            go_os="linux"
             ;;
         *)
             echo "Unsupported operating system for Go: $(detect_os)" >&2
@@ -276,6 +370,11 @@ install_go() {
     esac
 
     if command -v go >/dev/null 2>&1; then
+        return
+    fi
+
+    if [[ "$go_os" == "darwin" && -x /usr/local/go/bin/go ]]; then
+        export PATH="/usr/local/go/bin:$PATH"
         return
     fi
 
@@ -306,14 +405,23 @@ install_go() {
     go_version="${go_version#go}"
 
     tmpdir="$(mktemp -d)"
-    archive="$tmpdir/go.tar.gz"
-    curl -fsSL \
-        "https://go.dev/dl/go${go_version}.linux-${go_arch}.tar.gz" \
-        -o "$archive"
-    mkdir -p "$HOME/.local"
-    tar -xzf "$archive" -C "$HOME/.local"
+    if [[ "$go_os" == "darwin" ]]; then
+        archive="$tmpdir/go.pkg"
+        curl -fsSL \
+            "https://go.dev/dl/go${go_version}.${go_os}-${go_arch}.pkg" \
+            -o "$archive"
+        sudo installer -pkg "$archive" -target /
+        export PATH="/usr/local/go/bin:$PATH"
+    else
+        archive="$tmpdir/go.tar.gz"
+        curl -fsSL \
+            "https://go.dev/dl/go${go_version}.${go_os}-${go_arch}.tar.gz" \
+            -o "$archive"
+        mkdir -p "$HOME/.local"
+        tar -xzf "$archive" -C "$HOME/.local"
+        export PATH="$HOME/.local/go/bin:$PATH"
+    fi
     rm -rf "$tmpdir"
-    export PATH="$HOME/.local/go/bin:$PATH"
 }
 
 install_rustup() {
@@ -333,16 +441,14 @@ install_rustup() {
 setup_sdk() {
     # Install the runtime and Python-tool managers.
     case "$(detect_os)" in
-        macos)
-            install_mac asdf uv
+        macos|macos-intel)
+            install_asdf
+            install_uv
             ;;
         ubuntu)
             install_ubuntu curl
-            install_asdf_ubuntu
-            if ! command -v uv >/dev/null 2>&1; then
-                curl -LsSf https://astral.sh/uv/install.sh | sh
-                export PATH="$HOME/.local/bin:$PATH"
-            fi
+            install_asdf
+            install_uv
             ;;
         *)
             echo "Unsupported operating system for uv setup." >&2
@@ -350,13 +456,15 @@ setup_sdk() {
             ;;
     esac
 
+    install_gh
+
     # Configure asdf-managed runtime plugins.
     ensure_asdf_plugin ant https://github.com/halcyon/asdf-ant.git
     ensure_asdf_plugin java https://github.com/halcyon/asdf-java.git
     ensure_asdf_plugin maven https://github.com/halcyon/asdf-maven.git
     ensure_asdf_plugin nodejs https://github.com/asdf-vm/asdf-nodejs.git
 
-    # Install Go through Homebrew on macOS and the official distribution on Ubuntu; rustup uses its official installer.
+    # Install Go and rustup through their official installers.
     install_go
     install_rustup
 
@@ -431,6 +539,9 @@ setup_os() {
         macos)
             setup_macos
             ;;
+        macos-intel)
+            echo "Intel Mac detected; skipping OS package installation."
+            ;;
         ubuntu)
             setup_ubuntu
             ;;
@@ -450,7 +561,7 @@ setup_init() {
     setup_nvim
 
     case "$os" in
-        macos)
+        macos|macos-intel)
             setup_zsh
             ;;
         ubuntu)

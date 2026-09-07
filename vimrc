@@ -114,12 +114,9 @@ Plug 'airblade/vim-gitgutter'
 
 " code search and navigation
 Plug 'jeetsukumaran/vim-buffergator'
-Plug 'majutsushi/tagbar'
 
 " file search and navgigation
 Plug 'scrooloose/nerdtree'
-Plug 'junegunn/fzf.vim'
-Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --all' }
 
 call plug#end()
 
@@ -128,9 +125,6 @@ silent! colorscheme tokyonight
 
 " lightline
 let g:lightline = { 'colorscheme': 'tokyonight' }
-
-" TagBar:
-nmap <Leader>rt :TagbarToggle<CR>
 
 " NERDTree:
 map <C-n> :NERDTreeToggle<CR>
