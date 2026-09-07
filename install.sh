@@ -447,9 +447,7 @@ setup_init() {
 
     setup_os
     setup_git
-    setup_sdk
     setup_nvim
-    setup_zed
 
     case "$os" in
         macos)
@@ -477,7 +475,7 @@ Subcommands:
   git-config  Configure Git
   sdk      Install asdf plugins, Go, rustup, uv, Ruff, and SDK configuration
   ai-tools Install omp and CodeGraph
-  agent-instructions  Link shared CodeGraph instructions for Codex and omp
+  agent-instructions  Link shared CodeGraph instructions
   nvim     Install Neovim and dependencies, then configure it
   zed      Install Zed and configure its settings
   vim-config  Configure Vim

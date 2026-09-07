@@ -1,9 +1,7 @@
-## CodeGraph readiness
+## CodeGraph
 
-Before repository exploration or code changes:
+Before exploring or changing the repository:
 
-1. Check whether `codegraph` is on `PATH`.
-2. If unavailable, report that CodeGraph is unavailable; do not install global packages or modify MCP configuration without explicit user approval.
-3. If the repository has no `.codegraph/` directory, initialize its index with `codegraph init .`. Do not initialize a home directory, filesystem root, or non-repository directory.
-4. If `.codegraph/` exists, run `codegraph status .`. If it reports an out-of-date or failed index, run `codegraph sync .`; if sync cannot recover it, run `codegraph index .`.
-5. Use the `codegraph_explore` MCP tool before grep, broad file searches, or exploratory reads.
+- Verify `codegraph` is on `PATH`. If unavailable, report it; do not install packages or change MCP configuration without approval.
+- If `.codegraph/` is absent, run `codegraph init .`; otherwise run `codegraph status .`. For a stale or failed index, run `codegraph sync .`, then `codegraph index .` only if sync fails.
+- Use `codegraph_explore` before grep/find or broad reads when available; otherwise use `codegraph explore "<question>"`. Skip CodeGraph only when no `.codegraph/` directory exists.
