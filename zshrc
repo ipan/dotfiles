@@ -16,6 +16,11 @@ if [ -d "$HOME/.local/bin" ]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
+# Add Docker CLI binaries.
+if [ -d "$HOME/.docker/bin" ]; then
+    export PATH="$HOME/.docker/bin:$PATH"
+fi
+
 # Add Go-installed binaries.
 if [ -d "$GOBIN" ]; then
     export PATH="$GOBIN:$PATH"
